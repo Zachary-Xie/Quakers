@@ -19,232 +19,391 @@ from PIL import Image
 
 # 页面配置
 st.set_page_config(
-    page_title="AI Multi-Agent Workflow Platform",
+    page_title="智能化多Agent协作平台",
     page_icon="🤖",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
-# 自定义CSS样式 - 参考原版设计
+# 自定义CSS样式 - 完全按照原始设计
 st.markdown("""
 <style>
-    /* 主题色彩 */
-    :root {
-        --primary-color: #3B82F6;
-        --accent-color: #9333EA;
-        --success-color: #10B981;
-        --background-color: #F9FAFB;
-        --card-background: #FFFFFF;
-        --text-primary: #1F2937;
-        --text-secondary: #6B7280;
-        --border-color: #E5E7EB;
-    }
-    
     /* 隐藏Streamlit默认元素 */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
+    .stDeployButton {visibility: hidden;}
     
-    /* 主容器样式 */
+    /* 全局样式重置 */
     .main .block-container {
-        padding-top: 2rem;
-        padding-bottom: 2rem;
-        max-width: 1400px;
+        padding-top: 0;
+        padding-bottom: 0;
+        max-width: 100%;
+        margin: 0;
     }
     
-    /* 主标题样式 */
-    .main-header {
-        text-align: center;
-        color: var(--primary-color);
-        font-size: 3rem;
-        font-weight: 700;
-        margin-bottom: 1rem;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    
-    .main-subtitle {
-        text-align: center;
-        color: var(--text-secondary);
-        font-size: 1.25rem;
-        margin-bottom: 3rem;
-        font-weight: 400;
-    }
-    
-    /* 聊天消息样式 */
-    .chat-message {
-        padding: 1.25rem;
-        border-radius: 1rem;
-        margin: 1rem 0;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        animation: slideIn 0.3s ease-out;
-    }
-    
-    .user-message {
-        background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
-        border-left: 4px solid var(--primary-color);
-        margin-left: 2rem;
-        position: relative;
-    }
-    
-    .assistant-message {
-        background: linear-gradient(135deg, #F5F5F5 0%, #EEEEEE 100%);
-        border-left: 4px solid var(--accent-color);
-        margin-right: 2rem;
-        position: relative;
-    }
-    
-    .message-avatar {
-        position: absolute;
-        left: -2rem;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 2.5rem;
-        height: 2.5rem;
-        border-radius: 50%;
+    /* 顶部导航栏 */
+    .top-nav {
+        background: #FFFFFF;
+        padding: 1rem 2rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         display: flex;
+        justify-content: space-between;
         align-items: center;
-        justify-content: center;
-        font-size: 1.2rem;
-        font-weight: bold;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    }
-    
-    .user-avatar {
-        background: linear-gradient(135deg, var(--primary-color), #1E40AF);
-        color: white;
-    }
-    
-    .assistant-avatar {
-        background: linear-gradient(135deg, var(--accent-color), #7C3AED);
-        color: white;
-    }
-    
-    /* 面板样式 */
-    .panel {
-        background: var(--card-background);
-        border-radius: 1rem;
-        padding: 1.5rem;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        border: 1px solid var(--border-color);
-        margin-bottom: 1.5rem;
-        transition: all 0.3s ease;
-    }
-    
-    .panel:hover {
-        box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-        transform: translateY(-2px);
-    }
-    
-    .panel-header {
-        font-size: 1.5rem;
-        font-weight: 600;
-        color: var(--text-primary);
-        margin-bottom: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    
-    /* 状态卡片 */
-    .status-card {
-        background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
-        border: 1px solid #0EA5E9;
-        border-radius: 1rem;
-        padding: 1.5rem;
-        margin: 1rem 0;
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .status-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 4px;
-        height: 100%;
-        background: linear-gradient(180deg, var(--primary-color), var(--accent-color));
-    }
-    
-    /* 指标卡片 */
-    .metric-card {
-        background: var(--card-background);
-        border-radius: 1rem;
-        padding: 1.5rem;
-        text-align: center;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        border: 1px solid var(--border-color);
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .metric-card::before {
-        content: '';
-        position: absolute;
+        position: fixed;
         top: 0;
         left: 0;
         right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+        z-index: 1000;
+        height: 60px;
     }
     
-    .metric-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-    }
-    
-    .metric-number {
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: var(--primary-color);
-        margin-bottom: 0.5rem;
-    }
-    
-    .metric-label {
-        color: var(--text-secondary);
-        font-weight: 500;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        font-size: 0.875rem;
-    }
-    
-    /* 时间轴样式 */
-    .timeline-item {
+    .nav-brand {
         display: flex;
         align-items: center;
-        margin: 1rem 0;
-        padding: 1rem;
-        border-radius: 0.75rem;
+        gap: 0.5rem;
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #1F2937;
+    }
+    
+    .nav-brand-icon {
+        width: 32px;
+        height: 32px;
+        background: #3B82F6;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+    }
+    
+    .nav-menu {
+        display: flex;
+        gap: 2rem;
+        align-items: center;
+    }
+    
+    .nav-link {
+        color: #6B7280;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s;
+    }
+    
+    .nav-link:hover {
+        color: #3B82F6;
+    }
+    
+    .nav-actions {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+    
+    /* Hero区域 */
+    .hero-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 120px 2rem 80px;
+        text-align: center;
+        color: white;
+        margin-top: 60px;
+    }
+    
+    .hero-title {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .hero-subtitle {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        margin-bottom: 2rem;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .hero-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: #FFFFFF;
+        color: #3B82F6;
+        padding: 1rem 2rem;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         transition: all 0.3s ease;
-        position: relative;
     }
     
-    .timeline-item.completed {
-        background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%);
-        border-left: 4px solid var(--success-color);
+    .hero-cta:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.3);
     }
     
-    .timeline-item.pending {
-        background: linear-gradient(135deg, #FFF7ED 0%, #FED7AA 100%);
-        border-left: 4px solid #F59E0B;
+    /* 主要内容区域 */
+    .main-content {
+        padding: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 2rem;
     }
     
-    .timeline-item.waiting {
-        background: linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%);
-        border-left: 4px solid #9CA3AF;
+    /* 卡片样式 */
+    .card {
+        background: #FFFFFF;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        overflow: hidden;
+        transition: all 0.3s ease;
     }
     
-    .timeline-icon {
-        font-size: 1.5rem;
-        margin-right: 1rem;
-        width: 2.5rem;
-        height: 2.5rem;
+    .card:hover {
+        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        transform: translateY(-2px);
+    }
+    
+    .card-header {
+        padding: 1.5rem 1.5rem 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1F2937;
+        border-bottom: 1px solid #F3F4F6;
+    }
+    
+    .card-body {
+        padding: 1.5rem;
+    }
+    
+    /* 聊天区域 */
+    .chat-container {
+        height: 400px;
+        overflow-y: auto;
+        padding: 1rem;
+        background: #F9FAFB;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+    
+    .chat-message {
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+    
+    .chat-message.user {
+        flex-direction: row-reverse;
+    }
+    
+    .chat-avatar {
+        width: 32px;
+        height: 32px;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-weight: bold;
+        font-size: 0.9rem;
+        font-weight: 600;
+        flex-shrink: 0;
+    }
+    
+    .chat-avatar.user {
+        background: #3B82F6;
+        color: white;
+    }
+    
+    .chat-avatar.assistant {
+        background: #10B981;
+        color: white;
+    }
+    
+    .chat-bubble {
+        max-width: 70%;
+        padding: 0.75rem 1rem;
+        border-radius: 18px;
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+    
+    .chat-bubble.user {
+        background: #3B82F6;
+        color: white;
+        border-bottom-right-radius: 6px;
+    }
+    
+    .chat-bubble.assistant {
+        background: #FFFFFF;
+        color: #1F2937;
+        border: 1px solid #E5E7EB;
+        border-bottom-left-radius: 6px;
+    }
+    
+    /* 输入区域 */
+    .chat-input-container {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+    
+    .chat-input {
+        flex: 1;
+        padding: 0.75rem 1rem;
+        border: 1px solid #D1D5DB;
+        border-radius: 24px;
+        outline: none;
+        font-size: 0.9rem;
+        transition: border-color 0.3s;
+    }
+    
+    .chat-input:focus {
+        border-color: #3B82F6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .send-button {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #3B82F6;
+        color: white;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .send-button:hover {
+        background: #2563EB;
+        transform: scale(1.1);
+    }
+    
+    /* 报价表格 */
+    .quote-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 1rem;
+    }
+    
+    .quote-table th {
+        background: #F9FAFB;
+        padding: 0.75rem;
+        text-align: left;
+        font-weight: 600;
+        color: #374151;
+        border-bottom: 1px solid #E5E7EB;
+        font-size: 0.9rem;
+    }
+    
+    .quote-table td {
+        padding: 0.75rem;
+        border-bottom: 1px solid #F3F4F6;
+        font-size: 0.9rem;
+        color: #1F2937;
+    }
+    
+    .quote-table .service-icon {
+        width: 20px;
+        height: 20px;
+        display: inline-block;
+        margin-right: 0.5rem;
+        vertical-align: middle;
+    }
+    
+    .quote-table .price {
+        font-weight: 600;
+        color: #059669;
+    }
+    
+    .quote-total {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background: #F9FAFB;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        font-weight: 600;
+    }
+    
+    .quote-total .total-price {
+        font-size: 1.2rem;
+        color: #059669;
+    }
+    
+    /* 支付按钮 */
+    .payment-button {
+        width: 100%;
+        padding: 1rem;
+        background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    
+    .payment-button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    }
+    
+    /* 进度时间轴 */
+    .timeline {
+        position: relative;
+    }
+    
+    .timeline-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+    
+    .timeline-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-right: 1rem;
+        z-index: 2;
+    }
+    
+    .timeline-icon.completed {
+        background: #10B981;
+        color: white;
+    }
+    
+    .timeline-icon.pending {
+        background: #F59E0B;
+        color: white;
+    }
+    
+    .timeline-icon.waiting {
+        background: #D1D5DB;
+        color: #6B7280;
     }
     
     .timeline-content {
@@ -253,96 +412,90 @@ st.markdown("""
     
     .timeline-title {
         font-weight: 600;
-        color: var(--text-primary);
+        color: #1F2937;
         margin-bottom: 0.25rem;
+        font-size: 0.95rem;
     }
     
     .timeline-description {
-        color: var(--text-secondary);
-        font-size: 0.875rem;
+        color: #6B7280;
+        font-size: 0.85rem;
     }
     
-    /* 按钮样式 */
-    .stButton > button {
-        border-radius: 0.75rem;
-        border: none;
-        padding: 0.75rem 1.5rem;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        background: linear-gradient(135deg, var(--primary-color) 0%, #1E40AF 100%);
-        color: white;
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    .timeline-progress {
+        color: #3B82F6;
+        font-size: 0.85rem;
+        font-weight: 500;
     }
     
-    .stButton > button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
+    /* 统计卡片 */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .stat-card {
+        background: #F9FAFB;
+        padding: 1.5rem;
+        border-radius: 8px;
+        text-align: center;
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #3B82F6;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+        color: #6B7280;
+        font-size: 0.85rem;
+        font-weight: 500;
     }
     
     /* 文件上传区域 */
-    .uploadedFile {
-        border-radius: 1rem;
-        border: 2px dashed var(--border-color);
+    .upload-area {
+        border: 2px dashed #D1D5DB;
+        border-radius: 8px;
         padding: 2rem;
         text-align: center;
+        margin-bottom: 1rem;
         transition: all 0.3s ease;
+        cursor: pointer;
     }
     
-    .uploadedFile:hover {
-        border-color: var(--primary-color);
+    .upload-area:hover {
+        border-color: #3B82F6;
         background: #F8FAFC;
     }
     
-    /* 进度条样式 */
-    .stProgress > div > div > div > div {
-        background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
-        border-radius: 1rem;
+    .upload-icon {
+        font-size: 2rem;
+        color: #9CA3AF;
+        margin-bottom: 1rem;
     }
     
-    /* 侧边栏样式 */
-    .css-1d391kg {
-        background: linear-gradient(180deg, #F8FAFC 0%, #F1F5F9 100%);
-    }
-    
-    /* 动画效果 */
-    @keyframes slideIn {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    @keyframes pulse {
-        0%, 100% {
-            opacity: 1;
-        }
-        50% {
-            opacity: 0.7;
-        }
-    }
-    
-    .pulse {
-        animation: pulse 2s infinite;
+    .upload-text {
+        color: #6B7280;
+        font-size: 0.9rem;
     }
     
     /* 响应式设计 */
     @media (max-width: 768px) {
-        .main-header {
+        .main-content {
+            grid-template-columns: 1fr;
+            padding: 1rem;
+        }
+        
+        .hero-title {
             font-size: 2rem;
         }
         
-        .chat-message {
-            margin-left: 0;
-            margin-right: 0;
-        }
-        
-        .user-message, .assistant-message {
-            margin-left: 0;
-            margin-right: 0;
+        .nav-menu {
+            display: none;
         }
     }
 </style>
@@ -377,23 +530,23 @@ class LLMService:
             return {"error": f"API call failed: {str(e)}"}
     
     def _mock_response(self, message: str) -> Dict:
-        """Mock response"""
+        """模拟回复"""
         message_lower = message.lower()
         
-        if any(word in message_lower for word in ["image", "picture", "photo", "ocr", "text recognition"]):
+        if any(word in message_lower for word in ["图片", "图像", "照片", "ocr", "识别", "文字"]):
             return {
-                "content": "I see you mentioned image processing needs. I can help you use OCR technology to recognize text in images and convert it to Markdown format. Please upload your image file.",
-                "suggestions": ["Upload Image File", "View OCR Service Details", "Get Quote"]
+                "content": "我看到您提到了图像处理需求。我可以帮您使用OCR技术识别图像中的文字，并将其转换为Markdown格式。请上传您的图像文件。",
+                "suggestions": ["上传图像文件", "查看OCR服务详情", "获取报价"]
             }
-        elif any(word in message_lower for word in ["voice", "audio", "tts", "speech", "sound"]):
+        elif any(word in message_lower for word in ["语音", "音频", "tts", "朗读", "播放"]):
             return {
-                "content": "I understand you need text-to-speech service. I can convert your text into high-quality audio files. Please enter the text content you want to convert.",
-                "suggestions": ["Enter Text Content", "Choose Voice Type", "Preview Voice Sample"]
+                "content": "我了解您需要文本转语音服务。我可以将您的文本转换为高质量的语音文件。请输入您要转换的文本内容。",
+                "suggestions": ["输入文本内容", "选择语音类型", "试听语音样本"]
             }
         else:
             return {
-                "content": "Hello! I'm the AI assistant for the workflow platform. I can help you with:\n\n🖼️ **Image Text Recognition**: Convert text in images to Markdown format\n🔊 **Text-to-Speech**: Convert text to high-quality audio files\n\nPlease tell me what you need help with.",
-                "suggestions": ["Upload Image File", "Enter Text to Convert", "View Service Pricing"]
+                "content": "您好！我是AI工作流平台的智能助手。我可以帮您处理：\n\n🖼️ **图像文字识别**：将图片中的文字转换为Markdown格式\n🔊 **文本转语音**：将文本转换为高质量语音文件\n\n请告诉我您需要什么帮助。",
+                "suggestions": ["上传图像文件", "输入要转换的文本", "查看服务价格"]
             }
     
     async def _call_openai(self, message: str, api_key: str, history: List) -> Dict:
@@ -551,51 +704,47 @@ def main():
     """主应用函数"""
     services = get_services()
     
-    # Hero Section
-    st.markdown("<h1 class='main-header'>🤖 AI Multi-Agent Workflow Platform</h1>", unsafe_allow_html=True)
-    st.markdown("<p class='main-subtitle'>Transform your content with intelligent OCR and TTS services</p>", unsafe_allow_html=True)
+    # 顶部导航栏
+    st.markdown("""
+    <div class="top-nav">
+        <div class="nav-brand">
+            <div class="nav-brand-icon">AI</div>
+            <span>AI工作流</span>
+        </div>
+        <div class="nav-menu">
+            <a href="#" class="nav-link">工作流程</a>
+            <a href="#" class="nav-link">我的订单</a>
+        </div>
+        <div class="nav-actions">
+            <span style="color: #6B7280; font-size: 0.9rem;">中</span>
+            <span style="color: #6B7280; font-size: 0.9rem;">简</span>
+            <span style="color: #6B7280; font-size: 0.9rem;">⭐</span>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
     
-    # Sidebar Configuration
-    with st.sidebar:
-        st.header("⚙️ Configuration")
-        
-        # LLM Configuration
-        st.subheader("🧠 AI Model Settings")
-        llm_provider = st.selectbox(
-            "Choose AI Service Provider",
-            options=list(services['llm'].providers.keys()),
-            format_func=lambda x: services['llm'].providers[x]['name']
-        )
-        
-        llm_api_key = ""
-        if services['llm'].providers[llm_provider]['needsKey']:
-            llm_api_key = st.text_input(
-                "API Key", 
-                type="password",
-                help=f"Enter your {services['llm'].providers[llm_provider]['name']} API key"
-            )
-        
-        # TTS Configuration
-        st.subheader("🎵 Text-to-Speech Settings")
-        use_elevenlabs = st.checkbox("Use ElevenLabs TTS", help="Requires ElevenLabs API key")
-        
-        elevenlabs_api_key = ""
-        if use_elevenlabs:
-            elevenlabs_api_key = st.text_input(
-                "ElevenLabs API Key",
-                type="password"
-            )
-        
-        voice_id = st.selectbox(
-            "Select Voice",
-            options=list(services['tts'].voices.keys()),
-            format_func=lambda x: services['tts'].voices[x]
-        )
-        
-        # Clear Chat History
-        if st.button("🗑️ Clear Chat History"):
-            st.session_state.messages = []
-            st.rerun()
+    # Hero区域
+    st.markdown("""
+    <div class="hero-section">
+        <h1 class="hero-title">智能化多Agent协作平台</h1>
+        <p class="hero-subtitle">从需求澄清到内容交付，AI Agent协作让工作流程更高效</p>
+        <a href="#main-content" class="hero-cta">
+            开始项目 →
+        </a>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # 隐藏的配置区域（通过session state管理）
+    if "llm_provider" not in st.session_state:
+        st.session_state.llm_provider = "mock"
+    if "llm_api_key" not in st.session_state:
+        st.session_state.llm_api_key = ""
+    if "use_elevenlabs" not in st.session_state:
+        st.session_state.use_elevenlabs = False
+    if "elevenlabs_api_key" not in st.session_state:
+        st.session_state.elevenlabs_api_key = ""
+    if "voice_id" not in st.session_state:
+        st.session_state.voice_id = "21m00Tcm4TlvDq8ikWAM"
     
     # 初始化会话状态
     if "messages" not in st.session_state:
@@ -608,48 +757,62 @@ def main():
             "tasks": []
         }
     
-    # 主界面三列布局
+    # 主要内容区域 - 三个卡片
+    st.markdown('<div id="main-content" class="main-content">', unsafe_allow_html=True)
+    
+    # 第一个卡片：智能对话
     col1, col2, col3 = st.columns([1, 1, 1])
     
     with col1:
-        st.markdown('<div class="panel"><div class="panel-header">💬 Smart Conversation</div>', unsafe_allow_html=True)
+        st.markdown("""
+        <div class="card">
+            <div class="card-header">
+                💬 智能对话
+                <span style="background: #10B981; color: white; padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.8rem; margin-left: auto;">已连接</span>
+            </div>
+            <div class="card-body">
+                <div class="chat-container" id="chat-container">
+        """, unsafe_allow_html=True)
         
-        # Display Chat History
-        chat_container = st.container()
-        with chat_container:
-            for message in st.session_state.messages:
-                if message["role"] == "user":
-                    st.markdown(f"""
-                    <div class="chat-message user-message">
-                        <div class="message-avatar user-avatar">👤</div>
-                        <strong>You:</strong><br>
-                        {message["content"]}
-                    </div>
-                    """, unsafe_allow_html=True)
-                else:
-                    st.markdown(f"""
-                    <div class="chat-message assistant-message">
-                        <div class="message-avatar assistant-avatar">🤖</div>
-                        <strong>Assistant:</strong><br>
-                        {message["content"]}
-                    </div>
-                    """, unsafe_allow_html=True)
+        # 显示聊天消息
+        for message in st.session_state.messages:
+            if message["role"] == "user":
+                st.markdown(f"""
+                <div class="chat-message user">
+                    <div class="chat-bubble user">{message["content"]}</div>
+                    <div class="chat-avatar user">👤</div>
+                </div>
+                """, unsafe_allow_html=True)
+            else:
+                st.markdown(f"""
+                <div class="chat-message">
+                    <div class="chat-avatar assistant">🤖</div>
+                    <div class="chat-bubble assistant">{message["content"]}</div>
+                </div>
+                """, unsafe_allow_html=True)
         
-        # File Upload
+        st.markdown("</div>", unsafe_allow_html=True)
+        
+        # 文件上传区域
         uploaded_file = st.file_uploader(
-            "📁 Upload Image File (OCR)",
+            "",
             type=['png', 'jpg', 'jpeg', 'pdf'],
-            help="Supports PNG, JPG, JPEG, PDF formats"
+            help="支持PNG、JPG、JPEG、PDF格式",
+            label_visibility="collapsed"
         )
         
         if uploaded_file is not None:
-            # Display uploaded image
-            if uploaded_file.type.startswith('image'):
-                st.image(uploaded_file, caption="Uploaded Image", use_column_width=True)
+            st.markdown("""
+            <div style="background: #F0F9FF; padding: 1rem; border-radius: 8px; margin: 1rem 0; border: 1px solid #0EA5E9;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="color: #0EA5E9;">📁</span>
+                    <span style="font-size: 0.9rem; color: #1F2937;">""" + uploaded_file.name + """</span>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
             
-            if st.button("🔍 Start OCR Recognition"):
-                with st.spinner("Recognizing text in image..."):
-                    # Process OCR
+            if st.button("🔍 开始OCR识别", key="ocr_btn"):
+                with st.spinner("正在识别图像中的文字..."):
                     image_data = uploaded_file.read()
                     ocr_result = services['ocr'].extract_text_mock(image_data)
                     
@@ -660,159 +823,168 @@ def main():
                             "result": ocr_result
                         })
                         
-                        # Add to chat history
                         st.session_state.messages.append({
                             "role": "user",
-                            "content": f"Uploaded image file: {uploaded_file.name}"
+                            "content": f"上传了图像文件: {uploaded_file.name}"
                         })
                         st.session_state.messages.append({
                             "role": "assistant", 
-                            "content": f"✅ OCR Recognition Completed!\n\n**Extracted Text:**\n{ocr_result['extracted_text']}\n\n**Quality Score:** {ocr_result['qc_report']['score']}/100"
+                            "content": f"✅ OCR识别完成！\n\n**识别结果:**\n{ocr_result['extracted_text']}\n\n**质量评分:** {ocr_result['qc_report']['score']}/100"
                         })
                         st.rerun()
         
-        # Chat Input
-        user_input = st.text_input("💭 Enter your question or request:", key="chat_input")
+        # 聊天输入
+        user_input = st.text_input("", placeholder="输入您的需求...", key="chat_input", label_visibility="collapsed")
         
-        if st.button("Send", key="send_message") and user_input:
-            # 添加用户消息
+        if st.button("发送", key="send_message") and user_input:
             st.session_state.messages.append({"role": "user", "content": user_input})
             
-            # Generate AI response
-            with st.spinner("AI is thinking..."):
-                history = [{"role": msg["role"], "content": msg["content"]} 
-                          for msg in st.session_state.messages[-5:]]  # Keep only last 5 messages as context
-                
-                import asyncio
-                try:
-                    # Since Streamlit doesn't support async, use synchronous approach
-                    if llm_provider == 'mock':
-                        response = services['llm']._mock_response(user_input)
-                    else:
-                        # API calls need to be synchronous here
-                        response = {"content": "Sorry, external API calls are temporarily unavailable in Streamlit environment. Please use Local Mock mode."}
-                except Exception as e:
-                    response = {"error": str(e)}
-                
-                if "error" in response:
-                    ai_response = f"❌ {response['error']}"
-                else:
-                    ai_response = response["content"]
-                
+            with st.spinner("AI正在思考..."):
+                response = services['llm']._mock_response(user_input)
+                ai_response = response["content"]
                 st.session_state.messages.append({"role": "assistant", "content": ai_response})
                 st.rerun()
         
-        st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown("</div></div>", unsafe_allow_html=True)
     
     with col2:
-        st.markdown('<div class="panel"><div class="panel-header">💰 Quote & Payment</div>', unsafe_allow_html=True)
+        st.markdown("""
+        <div class="card">
+            <div class="card-header">
+                💰 报价与支付
+                <span style="background: #F59E0B; color: white; padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.8rem; margin-left: auto;">待付款</span>
+            </div>
+            <div class="card-body">
+        """, unsafe_allow_html=True)
         
-        # Generate Quote
-        if st.button("📊 Generate Project Quote"):
+        # 生成报价按钮
+        if st.button("📊 生成项目报价", key="generate_quote"):
             quote = {
                 "quote_id": str(uuid.uuid4()),
                 "tasks": [
                     {
-                        "name": "Image OCR Recognition",
-                        "description": "Recognize text in images and convert to Markdown format",
-                        "price": 50.0,
-                        "estimated_time": "5-10 minutes"
+                        "name": "图像文字识别",
+                        "description": "将图像中的文字识别并转换为Markdown格式",
+                        "price": 52.00,
+                        "estimated_time": "5-10分钟",
+                        "agent": "Agent A"
                     },
                     {
-                        "name": "Text-to-Speech",
-                        "description": "Convert text to high-quality audio files",
-                        "price": 30.0,
-                        "estimated_time": "3-8 minutes"
+                        "name": "文本转语音",
+                        "description": "将文本转换为高质量语音文件",
+                        "price": 8.00,
+                        "estimated_time": "3-5分钟", 
+                        "agent": "Agent B"
                     }
                 ],
-                "total_price": 80.0,
-                "currency": "USD",
+                "total_price": 21.00,
+                "currency": "CNY",
                 "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             }
-            
             st.session_state.project_data["quotes"].append(quote)
-            st.success("✅ Quote generated successfully!")
         
-        # Display Quote
+        # 显示报价表格
         if st.session_state.project_data["quotes"]:
             latest_quote = st.session_state.project_data["quotes"][-1]
             
+            st.markdown("""
+            <table class="quote-table">
+                <thead>
+                    <tr>
+                        <th>服务项目</th>
+                        <th>执行方</th>
+                        <th>预计时间</th>
+                        <th>价格</th>
+                    </tr>
+                </thead>
+                <tbody>
+            """, unsafe_allow_html=True)
+            
+            for task in latest_quote["tasks"]:
+                icon = "📄" if "图像" in task["name"] else "🎵"
+                st.markdown(f"""
+                <tr>
+                    <td><span class="service-icon">{icon}</span>{task["name"]}</td>
+                    <td>{task["agent"]}</td>
+                    <td>{task["estimated_time"]}</td>
+                    <td class="price">¥{task["price"]:.2f}</td>
+                </tr>
+                """, unsafe_allow_html=True)
+            
+            st.markdown("</tbody></table>", unsafe_allow_html=True)
+            
+            # 小计和总计
             st.markdown(f"""
-            <div class="status-card">
-                <h4>📋 Latest Quote</h4>
-                <p><strong>Quote ID:</strong> {latest_quote['quote_id'][:8]}...</p>
-                <p><strong>Total Price:</strong> ${latest_quote['total_price']}</p>
-                <p><strong>Created:</strong> {latest_quote['created_at']}</p>
+            <div style="padding: 0.5rem 0; border-bottom: 1px solid #F3F4F6; display: flex; justify-content: space-between;">
+                <span>小计</span>
+                <span>¥{sum(task['price'] for task in latest_quote['tasks']):.2f}</span>
+            </div>
+            <div style="padding: 0.5rem 0; border-bottom: 1px solid #F3F4F6; display: flex; justify-content: space-between;">
+                <span>平台费 (5%)</span>
+                <span>¥1.00</span>
+            </div>
+            <div class="quote-total">
+                <span>总计</span>
+                <span class="total-price">¥{latest_quote['total_price']:.2f}</span>
             </div>
             """, unsafe_allow_html=True)
             
-            st.subheader("📝 Task Details")
-            for task in latest_quote["tasks"]:
-                with st.expander(f"{task['name']} - ${task['price']}"):
-                    st.write(f"**Description:** {task['description']}")
-                    st.write(f"**Estimated Time:** {task['estimated_time']}")
+            # 智能合约支付区域
+            st.markdown("""
+            <div style="background: #ECFDF5; padding: 1rem; border-radius: 8px; border: 1px solid #10B981; margin: 1rem 0;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                    <span style="color: #10B981; font-weight: 600;">💎 智能合约托管</span>
+                    <span style="background: #10B981; color: white; padding: 0.2rem 0.4rem; border-radius: 4px; font-size: 0.7rem;">已部署</span>
+                </div>
+                <p style="font-size: 0.85rem; color: #065F46; margin: 0;">
+                    资金将通过CrossMe智能合约托管，项目完成后自动释放给服务商
+                </p>
+                <p style="font-size: 0.8rem; color: #6B7280; margin: 0.5rem 0 0 0;">
+                    合约地址：0x742d35Cc6aB8C0532Df4f3d...
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
             
-            # Mock Payment
-            if st.button("💳 Confirm Payment"):
+            # 支付按钮
+            if st.button("💳 立即支付 ¥21.00", key="payment_btn"):
                 st.session_state.project_data["payment_status"] = "completed"
-                st.success("✅ Payment successful! Project started.")
+                st.success("✅ 支付成功！项目已启动")
+                st.rerun()
         
-        # TTS Function
-        st.subheader("🎵 Text-to-Speech")
-        tts_text = st.text_area("Enter text to convert:", height=100)
+        else:
+            # 空状态
+            st.markdown("""
+            <div style="text-align: center; padding: 2rem; color: #9CA3AF;">
+                <div style="font-size: 2rem; margin-bottom: 1rem;">📊</div>
+                <p>点击"生成项目报价"开始</p>
+            </div>
+            """, unsafe_allow_html=True)
         
-        if st.button("🔊 Generate Speech") and tts_text:
-            with st.spinner("Generating speech..."):
-                if use_elevenlabs and elevenlabs_api_key:
-                    tts_result = services['tts'].generate_tts_with_elevenlabs(
-                        tts_text, voice_id, elevenlabs_api_key
-                    )
-                else:
-                    tts_result = services['tts'].generate_tts_mock(tts_text, voice_id)
-                
-                if "error" in tts_result:
-                    st.error(f"❌ {tts_result['error']}")
-                else:
-                    st.success("✅ Speech generated successfully!")
-                    
-                    # Display TTS results
-                    if "audio_data" in tts_result:
-                        st.audio(tts_result["audio_data"], format="audio/mp3")
-                    
-                    # Display QC Report
-                    if "qc_report" in tts_result:
-                        qc = tts_result["qc_report"]
-                        st.markdown(f"""
-                        **QC Quality Report:**
-                        - Overall Score: {qc['score']}/100
-                        - Audio Quality: {qc['audio_quality']}/100
-                        - Text Accuracy: {qc['text_accuracy']}/100
-                        - Voice Consistency: {qc['voice_consistency']}/100
-                        """)
-                    
-                    # Save to project data
-                    st.session_state.project_data["files"].append({
-                        "type": "tts",
-                        "text": tts_text,
-                        "result": tts_result
-                    })
-        
-        st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown("</div></div>", unsafe_allow_html=True)
     
     with col3:
-        st.markdown('<div class="panel"><div class="panel-header">📈 Project Progress</div>', unsafe_allow_html=True)
+        st.markdown("""
+        <div class="card">
+            <div class="card-header">
+                📈 执行进度
+                <span style="color: #3B82F6; font-size: 0.8rem; margin-left: auto;">2/6 完成</span>
+            </div>
+            <div class="card-body">
+        """, unsafe_allow_html=True)
         
-        # Progress Timeline
+        # 进度时间轴
         timeline_stages = [
-            {"name": "Requirements", "status": "completed", "progress": 100},
-            {"name": "Quote Generation", "status": "completed" if st.session_state.project_data["quotes"] else "pending", "progress": 100 if st.session_state.project_data["quotes"] else 0},
-            {"name": "Payment", "status": "completed" if st.session_state.project_data.get("payment_status") == "completed" else "pending", "progress": 100 if st.session_state.project_data.get("payment_status") == "completed" else 0},
-            {"name": "Processing", "status": "completed" if st.session_state.project_data["files"] else "pending", "progress": 100 if st.session_state.project_data["files"] else 0},
-            {"name": "Quality Check", "status": "completed" if st.session_state.project_data["files"] else "pending", "progress": 100 if st.session_state.project_data["files"] else 0},
-            {"name": "Delivery", "status": "completed" if len(st.session_state.project_data["files"]) >= 2 else "pending", "progress": 100 if len(st.session_state.project_data["files"]) >= 2 else 0}
+            {"name": "需求澄清", "status": "completed", "progress": "100%", "desc": "AI对话理解需求"},
+            {"name": "报价生成", "status": "completed" if st.session_state.project_data["quotes"] else "waiting", "progress": "100%" if st.session_state.project_data["quotes"] else "0%", "desc": "自动生成服务报价"},
+            {"name": "智能支付", "status": "completed" if st.session_state.project_data.get("payment_status") == "completed" else "waiting", "progress": "100%" if st.session_state.project_data.get("payment_status") == "completed" else "0%", "desc": "CrossMe合约托管"},
+            {"name": "Agent A执行", "status": "pending" if st.session_state.project_data.get("payment_status") == "completed" else "waiting", "progress": "0%", "desc": "图像文字识别处理"},
+            {"name": "Agent B执行", "status": "waiting", "progress": "0%", "desc": "文本转语音合成"},
+            {"name": "成果打包", "status": "waiting", "progress": "0%", "desc": "整理交付成果"}
         ]
         
-        for i, stage in enumerate(timeline_stages):
+        st.markdown('<div class="timeline">', unsafe_allow_html=True)
+        
+        for stage in timeline_stages:
             if stage["status"] == "completed":
                 icon = "✅"
                 css_class = "completed"
@@ -820,57 +992,84 @@ def main():
                 icon = "⏳"
                 css_class = "pending"
             else:
-                icon = "⭕"
+                icon = stage["progress"]
                 css_class = "waiting"
             
             st.markdown(f"""
-            <div class="timeline-item {css_class}">
-                <div class="timeline-icon">{icon}</div>
+            <div class="timeline-item">
+                <div class="timeline-icon {css_class}">{icon if stage['status'] != 'waiting' else '○'}</div>
                 <div class="timeline-content">
                     <div class="timeline-title">{stage['name']}</div>
-                    <div class="timeline-description">Progress: {stage['progress']}%</div>
+                    <div class="timeline-description">{stage['desc']}</div>
+                    <div class="timeline-progress">{stage['progress']}</div>
                 </div>
             </div>
             """, unsafe_allow_html=True)
-            
-            if stage["progress"] > 0:
-                st.progress(stage["progress"] / 100)
-        
-        # Project Statistics
-        st.subheader("📊 Project Statistics")
-        
-        col_a, col_b = st.columns(2)
-        with col_a:
-            st.markdown(f"""
-            <div class="metric-card">
-                <div class="metric-number">{len(st.session_state.project_data['files'])}</div>
-                <div class="metric-label">Files Processed</div>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        with col_b:
-            st.markdown(f"""
-            <div class="metric-card">
-                <div class="metric-number">{len(st.session_state.project_data['quotes'])}</div>
-                <div class="metric-label">Quotes Generated</div>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        # File Results
-        if st.session_state.project_data["files"]:
-            st.subheader("📁 Processing Results")
-            for i, file_data in enumerate(st.session_state.project_data["files"]):
-                with st.expander(f"{file_data['type'].upper()} - {file_data.get('filename', f'Task {i+1}')}"):
-                    if file_data["type"] == "ocr":
-                        st.markdown("**Extracted Text:**")
-                        st.text_area("", value=file_data["result"]["extracted_text"], height=100, disabled=True, key=f"ocr_{i}")
-                        st.markdown(f"**Confidence:** {file_data['result']['confidence']:.2%}")
-                    elif file_data["type"] == "tts":
-                        st.markdown(f"**Original Text:** {file_data['text']}")
-                        if "qc_report" in file_data["result"]:
-                            st.markdown(f"**Quality Score:** {file_data['result']['qc_report']['score']}/100")
         
         st.markdown('</div>', unsafe_allow_html=True)
+        
+        # 项目统计
+        st.markdown("""
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">""" + str(len(st.session_state.project_data['files'])) + """</div>
+                <div class="stat-label">已处理文件</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">""" + str(len(st.session_state.project_data['quotes'])) + """</div>
+                <div class="stat-label">生成报价</div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # 处理结果
+        if st.session_state.project_data["files"]:
+            st.markdown('<h4 style="margin-bottom: 1rem; color: #1F2937;">📁 处理结果</h4>', unsafe_allow_html=True)
+            for i, file_data in enumerate(st.session_state.project_data["files"]):
+                with st.expander(f"{file_data['type'].upper()} - {file_data.get('filename', f'任务{i+1}')}"):
+                    if file_data["type"] == "ocr":
+                        st.markdown("**识别文本:**")
+                        st.text_area("", value=file_data["result"]["extracted_text"], height=100, disabled=True, key=f"ocr_{i}")
+                        st.markdown(f"**置信度:** {file_data['result']['confidence']:.2%}")
+                    elif file_data["type"] == "tts":
+                        st.markdown(f"**原文本:** {file_data['text']}")
+                        if "qc_report" in file_data["result"]:
+                            st.markdown(f"**质量评分:** {file_data['result']['qc_report']['score']}/100")
+        
+        st.markdown("</div></div>", unsafe_allow_html=True)
+    
+    # 关闭主要内容区域
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # 底部区域
+    st.markdown("""
+    <div style="background: #F9FAFB; padding: 2rem; margin-top: 2rem; text-align: center;">
+        <div style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+            <div>
+                <h3 style="color: #1F2937; margin-bottom: 1rem;">下载中心</h3>
+                <p style="color: #6B7280; font-size: 0.9rem; margin-bottom: 1rem;">
+                    完成项目后，所有成果将在此处提供下载
+                </p>
+                <button style="background: #3B82F6; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; cursor: not-allowed; opacity: 0.5;">
+                    📥 下载项目文件
+                </button>
+            </div>
+            <div>
+                <h3 style="color: #1F2937; margin-bottom: 1rem;">交易记录</h3>
+                <div style="background: white; padding: 1rem; border-radius: 8px; border: 1px solid #E5E7EB;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span style="color: #6B7280; font-size: 0.9rem;">社交媒体</span>
+                        <span style="font-weight: 600;">¥21.00</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: #6B7280; font-size: 0.9rem;">智能合约托管</span>
+                        <span style="font-weight: 600;">¥21.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
