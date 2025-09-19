@@ -768,6 +768,7 @@ def main():
         <div class="nav-menu">
             <a href="#" class="nav-link">How it Works</a>
             <a href="#" class="nav-link">My Orders</a>
+            <a href="/Admin" class="nav-link" style="color: #3B82F6; font-weight: 600;">⚙️ Admin</a>
         </div>
         <div class="nav-actions">
             <span style="color: #6B7280; font-size: 0.9rem;">EN</span>
@@ -775,6 +776,10 @@ def main():
         </div>
     </div>
     """, unsafe_allow_html=True)
+    
+    # 添加admin页面快速访问按钮
+    if st.button("⚙️ Go to Admin Dashboard", key="admin_link", help="Access system configuration and analytics"):
+        st.switch_page("pages/1_Admin.py")
     
     # Hero区域
     st.markdown("""
@@ -787,17 +792,21 @@ def main():
     </div>
     """, unsafe_allow_html=True)
     
-    # 隐藏的配置区域（通过session state管理）
-    if "llm_provider" not in st.session_state:
-        st.session_state.llm_provider = "mock"
-    if "llm_api_key" not in st.session_state:
-        st.session_state.llm_api_key = ""
-    if "use_elevenlabs" not in st.session_state:
-        st.session_state.use_elevenlabs = False
-    if "elevenlabs_api_key" not in st.session_state:
-        st.session_state.elevenlabs_api_key = ""
-    if "voice_id" not in st.session_state:
-        st.session_state.voice_id = "21m00Tcm4TlvDq8ikWAM"
+    # 从admin配置加载设置
+    if "admin_data" not in st.session_state:
+        st.session_state.admin_data = {
+            "system_config": {
+                "llm_provider": "mock",
+                "llm_api_key": "",
+                "elevenlabs_api_key": "",
+                "default_voice": "21m00Tcm4TlvDq8ikWAM",
+                "max_file_size": 10,
+                "supported_formats": ["png", "jpg", "jpeg", "pdf"]
+            }
+        }
+    
+    # 使用admin配置
+    config = st.session_state.admin_data["system_config"]
     
     # 初始化会话状态
     if "messages" not in st.session_state:
@@ -856,8 +865,8 @@ def main():
             st.markdown("**📁 Upload Files**")
             uploaded_file = st.file_uploader(
                 "Choose an image file",
-                type=['png', 'jpg', 'jpeg', 'pdf'],
-                help="Supports PNG, JPG, JPEG, PDF formats",
+                type=config["supported_formats"],
+                help=f"Supports {', '.join(config['supported_formats']).upper()} formats (Max: {config['max_file_size']}MB)",
                 key="file_uploader"
             )
             
@@ -865,26 +874,38 @@ def main():
                 st.success(f"📁 File uploaded: {uploaded_file.name}")
                 
                 if st.button("🔍 Start OCR Recognition", key="ocr_btn"):
-                    with st.spinner("Recognizing text in image..."):
-                        image_data = uploaded_file.read()
-                        ocr_result = services['ocr'].extract_text_mock(image_data)
-                        
-                        if ocr_result["status"] == "completed":
-                            st.session_state.project_data["files"].append({
-                                "type": "ocr",
-                                "filename": uploaded_file.name,
-                                "result": ocr_result
-                            })
+                    # 检查文件大小
+                    file_size_mb = len(uploaded_file.getvalue()) / (1024 * 1024)
+                    if file_size_mb > config["max_file_size"]:
+                        st.error(f"❌ File size ({file_size_mb:.1f}MB) exceeds limit ({config['max_file_size']}MB)")
+                    else:
+                        with st.spinner("Recognizing text in image..."):
+                            image_data = uploaded_file.read()
+                            ocr_result = services['ocr'].extract_text_mock(image_data)
                             
-                            st.session_state.messages.append({
-                                "role": "user",
-                                "content": f"Uploaded image file: {uploaded_file.name}"
-                            })
-                            st.session_state.messages.append({
-                                "role": "assistant", 
-                                "content": f"✅ OCR Recognition Completed!\n\n**Extracted Text:**\n{ocr_result['extracted_text']}\n\n**Quality Score:** {ocr_result['qc_report']['score']}/100"
-                            })
-                            st.rerun()
+                            if ocr_result["status"] == "completed":
+                                st.session_state.project_data["files"].append({
+                                    "type": "ocr",
+                                    "filename": uploaded_file.name,
+                                    "result": ocr_result
+                                })
+                                
+                                st.session_state.messages.append({
+                                    "role": "user",
+                                    "content": f"Uploaded image file: {uploaded_file.name}"
+                                })
+                                st.session_state.messages.append({
+                                    "role": "assistant", 
+                                    "content": f"✅ OCR Recognition Completed!\n\n**Extracted Text:**\n{ocr_result['extracted_text']}\n\n**Quality Score:** {ocr_result['qc_report']['score']}/100"
+                                })
+                                
+                                # 更新admin统计数据
+                                if "admin_data" not in st.session_state:
+                                    st.session_state.admin_data = {"total_projects": 0, "total_revenue": 0}
+                                st.session_state.admin_data["total_projects"] = st.session_state.admin_data.get("total_projects", 0) + 1
+                                st.session_state.admin_data["total_revenue"] = st.session_state.admin_data.get("total_revenue", 0) + 15.00
+                                
+                                st.rerun()
             
             # 聊天输入
             st.markdown("**💭 Chat Input**")
@@ -898,7 +919,13 @@ def main():
                 st.session_state.messages.append({"role": "user", "content": user_input})
                 
                 with st.spinner("AI is thinking..."):
-                    response = services['llm']._mock_response(user_input)
+                    # 使用admin配置中的LLM设置
+                    if config["llm_provider"] == "mock":
+                        response = services['llm']._mock_response(user_input)
+                    else:
+                        # 对于其他提供商，可以扩展支持
+                        response = services['llm']._mock_response(user_input)
+                    
                     ai_response = response["content"]
                     st.session_state.messages.append({"role": "assistant", "content": ai_response})
                     st.rerun()
@@ -999,12 +1026,22 @@ def main():
             
             if st.button("🔊 Generate Speech", key="tts_btn") and tts_text:
                 with st.spinner("Generating speech..."):
-                    tts_result = services['tts'].generate_tts_mock(tts_text, st.session_state.voice_id)
+                    # 使用admin配置中的设置
+                    if config["elevenlabs_api_key"]:
+                        tts_result = services['tts'].generate_tts_with_elevenlabs(
+                            tts_text, config["default_voice"], config["elevenlabs_api_key"]
+                        )
+                    else:
+                        tts_result = services['tts'].generate_tts_mock(tts_text, config["default_voice"])
                     
                     if "error" in tts_result:
                         st.error(f"❌ {tts_result['error']}")
                     else:
                         st.success("✅ Speech generated successfully!")
+                        
+                        # 显示音频播放器（如果有实际音频数据）
+                        if "audio_data" in tts_result:
+                            st.audio(tts_result["audio_data"], format="audio/mp3")
                         
                         # 显示QC报告
                         if "qc_report" in tts_result:
@@ -1023,6 +1060,12 @@ def main():
                             "text": tts_text,
                             "result": tts_result
                         })
+                        
+                        # 更新admin统计数据
+                        if "admin_data" not in st.session_state:
+                            st.session_state.admin_data = {"total_projects": 0, "total_revenue": 0}
+                        st.session_state.admin_data["total_projects"] = st.session_state.admin_data.get("total_projects", 0) + 1
+                        st.session_state.admin_data["total_revenue"] = st.session_state.admin_data.get("total_revenue", 0) + 8.00
     
     # 第三个卡片：项目进度
     with col3:
