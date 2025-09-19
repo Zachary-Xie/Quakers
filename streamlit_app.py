@@ -25,9 +25,11 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# 自定义CSS样式 - 完全按照原始设计
+# 现代化CSS样式 - 基于参考设计的美观界面
 st.markdown("""
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
     /* 隐藏Streamlit默认元素 */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
@@ -35,102 +37,65 @@ st.markdown("""
     .stDeployButton {visibility: hidden;}
     
     /* 全局样式重置 */
+    * {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    
     .main .block-container {
-        padding-top: 0;
-        padding-bottom: 0;
+        padding: 0;
         max-width: 100%;
         margin: 0;
     }
     
-    /* 隐藏Streamlit默认组件样式 */
-    .stButton > button {
-        width: 100%;
-        border-radius: 8px;
-        border: none;
-        padding: 0.75rem 1.5rem;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
-        color: white;
-        box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+    body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        margin: 0;
+        padding: 0;
     }
     
-    .stButton > button:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-    }
-    
-    .stTextInput > div > div > input {
-        border-radius: 8px;
-        border: 1px solid #D1D5DB;
-        padding: 0.75rem;
-        font-size: 0.9rem;
-    }
-    
-    .stTextInput > div > div > input:focus {
-        border-color: #3B82F6;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
-    
-    .stTextArea > div > div > textarea {
-        border-radius: 8px;
-        border: 1px solid #D1D5DB;
-        padding: 0.75rem;
-        font-size: 0.9rem;
-    }
-    
-    .stSelectbox > div > div > div {
-        border-radius: 8px;
-    }
-    
-    .stFileUploader > div {
-        border-radius: 8px;
-        border: 2px dashed #D1D5DB;
-        padding: 2rem;
-        text-align: center;
-        transition: all 0.3s ease;
-    }
-    
-    .stFileUploader > div:hover {
-        border-color: #3B82F6;
-        background: #F8FAFC;
-    }
-    
-    /* 顶部导航栏 */
-    .top-nav {
-        background: #FFFFFF;
+    /* 顶部导航栏 - 现代化设计 */
+    .modern-nav {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
         padding: 1rem 2rem;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
         position: fixed;
         top: 0;
         left: 0;
         right: 0;
         z-index: 1000;
-        height: 60px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        animation: slideDown 0.8s ease-out;
+    }
+    
+    @keyframes slideDown {
+        from { transform: translateY(-100%); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
     }
     
     .nav-brand {
         display: flex;
         align-items: center;
-        gap: 0.5rem;
-        font-size: 1.2rem;
-        font-weight: 600;
-        color: #1F2937;
+        gap: 0.75rem;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1a1a1a;
     }
     
-    .nav-brand-icon {
-        width: 32px;
-        height: 32px;
-        background: #3B82F6;
-        border-radius: 6px;
+    .nav-logo {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
         color: white;
         font-weight: bold;
+        font-size: 1.1rem;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
     }
     
     .nav-menu {
@@ -140,417 +105,494 @@ st.markdown("""
     }
     
     .nav-link {
-        color: #6B7280;
+        color: #64748b;
         text-decoration: none;
         font-weight: 500;
-        transition: color 0.3s;
+        font-size: 0.95rem;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
     }
     
     .nav-link:hover {
-        color: #3B82F6;
+        color: #667eea;
+        background: rgba(102, 126, 234, 0.1);
+        transform: translateY(-1px);
     }
     
-    .nav-actions {
-        display: flex;
-        gap: 1rem;
-        align-items: center;
+    .nav-link.admin {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        font-weight: 600;
     }
     
-    /* Hero区域 */
+    .nav-link.admin:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
+    
+    /* Hero区域 - 现代化渐变 */
     .hero-section {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        padding: 120px 2rem 80px;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
         text-align: center;
         color: white;
-        margin-top: 60px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="1" fill="white" opacity="0.1"/><circle cx="10" cy="60" r="1" fill="white" opacity="0.1"/><circle cx="90" cy="40" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+        opacity: 0.3;
+    }
+    
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        animation: fadeInUp 1.2s ease-out;
+    }
+    
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(50px); }
+        to { opacity: 1; transform: translateY(0); }
     }
     
     .hero-title {
-        font-size: 3rem;
+        font-size: 3.5rem;
         font-weight: 700;
-        margin-bottom: 1rem;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        margin-bottom: 1.5rem;
+        text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        line-height: 1.2;
     }
     
     .hero-subtitle {
-        font-size: 1.2rem;
-        opacity: 0.9;
-        margin-bottom: 2rem;
-        max-width: 600px;
-        margin-left: auto;
-        margin-right: auto;
+        font-size: 1.3rem;
+        opacity: 0.95;
+        margin-bottom: 3rem;
+        max-width: 700px;
+        line-height: 1.6;
+        font-weight: 400;
     }
     
     .hero-cta {
         display: inline-flex;
         align-items: center;
-        gap: 0.5rem;
-        background: #FFFFFF;
-        color: #3B82F6;
-        padding: 1rem 2rem;
+        gap: 0.75rem;
+        background: rgba(255, 255, 255, 0.95);
+        color: #667eea;
+        padding: 1.25rem 2.5rem;
         border-radius: 50px;
         text-decoration: none;
         font-weight: 600;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        transition: all 0.3s ease;
+        font-size: 1.1rem;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        transition: all 0.4s ease;
+        backdrop-filter: blur(10px);
     }
     
     .hero-cta:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        transform: translateY(-3px);
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        background: white;
     }
     
-    /* 主要内容区域 */
+    /* 主要内容区域 - 现代化网格布局 */
     .main-content {
-        padding: 2rem;
-        max-width: 1200px;
+        padding: 4rem 2rem;
+        max-width: 1400px;
         margin: 0 auto;
         display: grid;
-        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
         gap: 2rem;
+        animation: fadeIn 1s ease-out 0.3s both;
     }
     
-    /* 卡片样式 */
-    .card {
-        background: #FFFFFF;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* 现代化卡片设计 */
+    .modern-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         overflow: hidden;
-        transition: all 0.3s ease;
+        transition: all 0.4s ease;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        position: relative;
     }
     
-    .card:hover {
-        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-        transform: translateY(-2px);
+    .modern-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    }
+    
+    .modern-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
     }
     
     .card-header {
-        padding: 1.5rem 1.5rem 1rem;
+        padding: 2rem 2rem 1rem;
         display: flex;
         align-items: center;
-        gap: 0.5rem;
-        font-size: 1.1rem;
+        justify-content: space-between;
+    }
+    
+    .card-title {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 1.25rem;
         font-weight: 600;
-        color: #1F2937;
-        border-bottom: 1px solid #F3F4F6;
+        color: #1a1a1a;
+    }
+    
+    .card-icon {
+        font-size: 1.5rem;
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+    
+    .status-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .status-connected {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    }
+    
+    .status-pending {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: white;
+        box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
     }
     
     .card-body {
-        padding: 1.5rem;
+        padding: 0 2rem 2rem;
     }
     
-    /* 聊天区域 */
+    /* 聊天界面现代化 */
     .chat-container {
-        height: 400px;
+        height: 350px;
         overflow-y: auto;
-        padding: 1rem;
-        background: #F9FAFB;
-        border-radius: 8px;
-        margin-bottom: 1rem;
+        padding: 1.5rem;
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        border-radius: 16px;
+        margin-bottom: 1.5rem;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .chat-container::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .chat-container::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    
+    .chat-container::-webkit-scrollbar-thumb {
+        background: rgba(102, 126, 234, 0.3);
+        border-radius: 3px;
     }
     
     .chat-message {
-        margin-bottom: 1rem;
+        margin-bottom: 1.5rem;
         display: flex;
         align-items: flex-start;
-        gap: 0.75rem;
+        gap: 1rem;
+        animation: messageSlide 0.5s ease-out;
+    }
+    
+    @keyframes messageSlide {
+        from { opacity: 0; transform: translateX(-20px); }
+        to { opacity: 1; transform: translateX(0); }
     }
     
     .chat-message.user {
         flex-direction: row-reverse;
     }
     
+    .chat-message.user .chat-bubble {
+        animation: messageSlideRight 0.5s ease-out;
+    }
+    
+    @keyframes messageSlideRight {
+        from { opacity: 0; transform: translateX(20px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+    
     .chat-avatar {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 0.9rem;
+        font-size: 1.1rem;
         font-weight: 600;
         flex-shrink: 0;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     }
     
     .chat-avatar.user {
-        background: #3B82F6;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
     }
     
     .chat-avatar.assistant {
-        background: #10B981;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         color: white;
     }
     
     .chat-bubble {
-        max-width: 70%;
-        padding: 0.75rem 1rem;
+        max-width: 75%;
+        padding: 1rem 1.25rem;
         border-radius: 18px;
-        font-size: 0.9rem;
-        line-height: 1.4;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     }
     
     .chat-bubble.user {
-        background: #3B82F6;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
         border-bottom-right-radius: 6px;
     }
     
     .chat-bubble.assistant {
-        background: #FFFFFF;
-        color: #1F2937;
-        border: 1px solid #E5E7EB;
+        background: white;
+        color: #374151;
+        border: 1px solid rgba(0, 0, 0, 0.05);
         border-bottom-left-radius: 6px;
     }
     
-    /* 输入区域 */
-    .chat-input-container {
-        display: flex;
-        gap: 0.5rem;
-        align-items: center;
-    }
-    
-    .chat-input {
-        flex: 1;
-        padding: 0.75rem 1rem;
-        border: 1px solid #D1D5DB;
-        border-radius: 24px;
-        outline: none;
-        font-size: 0.9rem;
-        transition: border-color 0.3s;
-    }
-    
-    .chat-input:focus {
-        border-color: #3B82F6;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
-    
-    .send-button {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: #3B82F6;
-        color: white;
-        border: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-    
-    .send-button:hover {
-        background: #2563EB;
-        transform: scale(1.1);
-    }
-    
-    /* 报价表格 */
-    .quote-table {
+    /* 现代化按钮样式 */
+    .stButton > button {
         width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 1rem;
-    }
-    
-    .quote-table th {
-        background: #F9FAFB;
-        padding: 0.75rem;
-        text-align: left;
-        font-weight: 600;
-        color: #374151;
-        border-bottom: 1px solid #E5E7EB;
-        font-size: 0.9rem;
-    }
-    
-    .quote-table td {
-        padding: 0.75rem;
-        border-bottom: 1px solid #F3F4F6;
-        font-size: 0.9rem;
-        color: #1F2937;
-    }
-    
-    .quote-table .service-icon {
-        width: 20px;
-        height: 20px;
-        display: inline-block;
-        margin-right: 0.5rem;
-        vertical-align: middle;
-    }
-    
-    .quote-table .price {
-        font-weight: 600;
-        color: #059669;
-    }
-    
-    .quote-total {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1rem;
-        background: #F9FAFB;
-        border-radius: 8px;
-        margin-bottom: 1rem;
-        font-weight: 600;
-    }
-    
-    .quote-total .total-price {
-        font-size: 1.2rem;
-        color: #059669;
-    }
-    
-    /* 支付按钮 */
-    .payment-button {
-        width: 100%;
-        padding: 1rem;
-        background: linear-gradient(135deg, #10B981 0%, #059669 100%);
-        color: white;
+        border-radius: 12px;
         border: none;
-        border-radius: 8px;
-        font-size: 1rem;
+        padding: 1rem 1.5rem;
         font-weight: 600;
-        cursor: pointer;
+        font-size: 0.95rem;
         transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-    }
-    
-    .payment-button:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
-    }
-    
-    /* 进度时间轴 */
-    .timeline {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        cursor: pointer;
         position: relative;
+        overflow: hidden;
     }
     
+    .stButton > button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
+    
+    .stButton > button:active {
+        transform: translateY(0);
+    }
+    
+    /* 输入框现代化 */
+    .stTextInput > div > div > input,
+    .stTextArea > div > div > textarea {
+        border-radius: 12px;
+        border: 2px solid rgba(0, 0, 0, 0.05);
+        padding: 1rem;
+        font-size: 0.95rem;
+        background: rgba(255, 255, 255, 0.8);
+        transition: all 0.3s ease;
+    }
+    
+    .stTextInput > div > div > input:focus,
+    .stTextArea > div > div > textarea:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        background: white;
+    }
+    
+    /* 文件上传现代化 */
+    .stFileUploader > div {
+        border-radius: 16px;
+        border: 2px dashed rgba(102, 126, 234, 0.3);
+        padding: 2.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+    }
+    
+    .stFileUploader > div:hover {
+        border-color: #667eea;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        transform: translateY(-2px);
+    }
+    
+    /* 进度时间轴现代化 */
     .timeline-item {
         display: flex;
         align-items: center;
         margin-bottom: 1.5rem;
+        padding: 1rem;
+        border-radius: 12px;
+        transition: all 0.3s ease;
         position: relative;
+        overflow: hidden;
+    }
+    
+    .timeline-item.completed {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%);
+        border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+    
+    .timeline-item.pending {
+        background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.1) 100%);
+        border: 1px solid rgba(245, 158, 11, 0.2);
+    }
+    
+    .timeline-item.waiting {
+        background: rgba(0, 0, 0, 0.02);
+        border: 1px solid rgba(0, 0, 0, 0.05);
     }
     
     .timeline-icon {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 0.9rem;
+        font-size: 1.2rem;
         font-weight: 600;
-        margin-right: 1rem;
-        z-index: 2;
+        margin-right: 1.5rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     }
     
     .timeline-icon.completed {
-        background: #10B981;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         color: white;
     }
     
     .timeline-icon.pending {
-        background: #F59E0B;
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
         color: white;
     }
     
     .timeline-icon.waiting {
-        background: #D1D5DB;
-        color: #6B7280;
-    }
-    
-    .timeline-content {
-        flex: 1;
-    }
-    
-    .timeline-title {
-        font-weight: 600;
-        color: #1F2937;
-        margin-bottom: 0.25rem;
-        font-size: 0.95rem;
-    }
-    
-    .timeline-description {
-        color: #6B7280;
-        font-size: 0.85rem;
-    }
-    
-    .timeline-progress {
-        color: #3B82F6;
-        font-size: 0.85rem;
-        font-weight: 500;
+        background: #f1f5f9;
+        color: #64748b;
     }
     
     /* 统计卡片 */
-    .stats-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1rem;
-        margin-bottom: 1.5rem;
+    .stat-card {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        padding: 2rem;
+        border-radius: 16px;
+        text-align: center;
+        border: 1px solid rgba(102, 126, 234, 0.2);
+        transition: all 0.3s ease;
     }
     
-    .stat-card {
-        background: #F9FAFB;
-        padding: 1.5rem;
-        border-radius: 8px;
-        text-align: center;
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 40px rgba(102, 126, 234, 0.15);
     }
     
     .stat-number {
-        font-size: 2rem;
+        font-size: 2.5rem;
         font-weight: 700;
-        color: #3B82F6;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
         margin-bottom: 0.5rem;
     }
     
     .stat-label {
-        color: #6B7280;
-        font-size: 0.85rem;
-        font-weight: 500;
-    }
-    
-    /* 文件上传区域 */
-    .upload-area {
-        border: 2px dashed #D1D5DB;
-        border-radius: 8px;
-        padding: 2rem;
-        text-align: center;
-        margin-bottom: 1rem;
-        transition: all 0.3s ease;
-        cursor: pointer;
-    }
-    
-    .upload-area:hover {
-        border-color: #3B82F6;
-        background: #F8FAFC;
-    }
-    
-    .upload-icon {
-        font-size: 2rem;
-        color: #9CA3AF;
-        margin-bottom: 1rem;
-    }
-    
-    .upload-text {
-        color: #6B7280;
+        color: #64748b;
         font-size: 0.9rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
     
     /* 响应式设计 */
     @media (max-width: 768px) {
         .main-content {
             grid-template-columns: 1fr;
-            padding: 1rem;
+            padding: 2rem 1rem;
         }
         
         .hero-title {
-            font-size: 2rem;
+            font-size: 2.5rem;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.1rem;
         }
         
         .nav-menu {
             display: none;
         }
+        
+        .modern-nav {
+            padding: 1rem;
+        }
+    }
+    
+    /* 加载动画 */
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+    
+    .loading {
+        animation: pulse 2s infinite;
+    }
+    
+    /* 成功/错误消息样式 */
+    .stSuccess {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        border-radius: 12px;
+        color: #065f46;
+    }
+    
+    .stError {
+        background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.1) 100%);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-radius: 12px;
+        color: #991b1b;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -758,21 +800,21 @@ def main():
     """主应用函数"""
     services = get_services()
     
-    # 顶部导航栏
+    # 现代化顶部导航栏
     st.markdown("""
-    <div class="top-nav">
+    <div class="modern-nav">
         <div class="nav-brand">
-            <div class="nav-brand-icon">AI</div>
+            <div class="nav-logo">AI</div>
             <span>AI Workflow</span>
         </div>
         <div class="nav-menu">
             <a href="#" class="nav-link">How it Works</a>
             <a href="#" class="nav-link">My Orders</a>
-            <a href="/Admin" class="nav-link" style="color: #3B82F6; font-weight: 600;">⚙️ Admin</a>
+            <a href="/Admin" class="nav-link admin">⚙️ Admin</a>
         </div>
-        <div class="nav-actions">
-            <span style="color: #6B7280; font-size: 0.9rem;">EN</span>
-            <span style="color: #6B7280; font-size: 0.9rem;">⭐</span>
+        <div style="display: flex; gap: 1rem; align-items: center;">
+            <span style="color: #64748b; font-size: 0.9rem; font-weight: 500;">EN</span>
+            <span style="color: #64748b; font-size: 1.1rem;">⭐</span>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -781,14 +823,16 @@ def main():
     if st.button("⚙️ Go to Admin Dashboard", key="admin_link", help="Access system configuration and analytics"):
         st.switch_page("pages/1_Admin.py")
     
-    # Hero区域
+    # 现代化Hero区域
     st.markdown("""
     <div class="hero-section">
-        <h1 class="hero-title">AI Multi-Agent Workflow Platform</h1>
-        <p class="hero-subtitle">From requirement clarification to content delivery, AI Agents make workflows more efficient</p>
-        <a href="#main-content" class="hero-cta">
-            Start Project →
-        </a>
+        <div class="hero-content">
+            <h1 class="hero-title">AI Multi-Agent Workflow Platform</h1>
+            <p class="hero-subtitle">From requirement clarification to content delivery, AI Agents make workflows more efficient</p>
+            <a href="#main-content" class="hero-cta">
+                🚀 Start Project
+            </a>
+        </div>
     </div>
     """, unsafe_allow_html=True)
     
@@ -829,12 +873,15 @@ def main():
     with col1:
         with st.container():
             st.markdown("""
-            <div class="card">
+            <div class="modern-card">
                 <div class="card-header">
-                    💬 Smart Conversation
-                    <span style="background: #10B981; color: white; padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.8rem; margin-left: auto;">Connected</span>
+                    <div class="card-title">
+                        <div class="card-icon">💬</div>
+                        Smart Conversation
+                    </div>
+                    <span class="status-badge status-connected">Connected</span>
                 </div>
-            </div>
+                <div class="card-body">
             """, unsafe_allow_html=True)
             
             # 聊天容器
@@ -929,17 +976,25 @@ def main():
                     ai_response = response["content"]
                     st.session_state.messages.append({"role": "assistant", "content": ai_response})
                     st.rerun()
+            
+            st.markdown("""
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
     
     # 第二个卡片：报价与支付
     with col2:
         with st.container():
             st.markdown("""
-            <div class="card">
+            <div class="modern-card">
                 <div class="card-header">
-                    💰 Quote & Payment
-                    <span style="background: #F59E0B; color: white; padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.8rem; margin-left: auto;">Pending</span>
+                    <div class="card-title">
+                        <div class="card-icon">💰</div>
+                        Quote & Payment
+                    </div>
+                    <span class="status-badge status-pending">Pending</span>
                 </div>
-            </div>
+                <div class="card-body">
             """, unsafe_allow_html=True)
             
             # 生成报价按钮
@@ -1066,17 +1121,25 @@ def main():
                             st.session_state.admin_data = {"total_projects": 0, "total_revenue": 0}
                         st.session_state.admin_data["total_projects"] = st.session_state.admin_data.get("total_projects", 0) + 1
                         st.session_state.admin_data["total_revenue"] = st.session_state.admin_data.get("total_revenue", 0) + 8.00
+            
+            st.markdown("""
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
     
     # 第三个卡片：项目进度
     with col3:
         with st.container():
             st.markdown("""
-            <div class="card">
+            <div class="modern-card">
                 <div class="card-header">
-                    📈 Project Progress
-                    <span style="color: #3B82F6; font-size: 0.8rem; margin-left: auto;">2/6 Complete</span>
+                    <div class="card-title">
+                        <div class="card-icon">📈</div>
+                        Project Progress
+                    </div>
+                    <span style="color: #667eea; font-size: 0.85rem; font-weight: 600;">2/6 Complete</span>
                 </div>
-            </div>
+                <div class="card-body">
             """, unsafe_allow_html=True)
             
             # 进度时间轴
@@ -1103,13 +1166,13 @@ def main():
                     progress = 0
                 
                 st.markdown(f"""
-                <div style="display: flex; align-items: center; margin-bottom: 1rem; padding: 0.75rem; background: {'#ECFDF5' if stage['status'] == 'completed' else '#FFF7ED' if stage['status'] == 'pending' else '#F9FAFB'}; border-radius: 8px;">
-                    <div style="margin-right: 1rem; font-size: 1.2rem;">{icon}</div>
+                <div class="timeline-item {stage['status']}">
+                    <div class="timeline-icon {stage['status']}">{icon}</div>
                     <div style="flex: 1;">
-                        <div style="font-weight: 600; color: #1F2937;">{stage['name']}</div>
-                        <div style="font-size: 0.85rem; color: #6B7280;">{stage['desc']}</div>
+                        <div style="font-weight: 600; color: #1a1a1a; font-size: 0.95rem;">{stage['name']}</div>
+                        <div style="font-size: 0.85rem; color: #64748b; margin-top: 0.25rem;">{stage['desc']}</div>
                     </div>
-                    <div style="font-size: 0.85rem; color: #3B82F6; font-weight: 500;">{progress}%</div>
+                    <div style="font-size: 0.85rem; color: #667eea; font-weight: 600;">{progress}%</div>
                 </div>
                 """, unsafe_allow_html=True)
                 
@@ -1121,9 +1184,19 @@ def main():
             
             col_a, col_b = st.columns(2)
             with col_a:
-                st.metric("Files Processed", len(st.session_state.project_data['files']))
+                st.markdown(f"""
+                <div class="stat-card">
+                    <div class="stat-number">{len(st.session_state.project_data['files'])}</div>
+                    <div class="stat-label">Files Processed</div>
+                </div>
+                """, unsafe_allow_html=True)
             with col_b:
-                st.metric("Quotes Generated", len(st.session_state.project_data['quotes']))
+                st.markdown(f"""
+                <div class="stat-card">
+                    <div class="stat-number">{len(st.session_state.project_data['quotes'])}</div>
+                    <div class="stat-label">Quotes Generated</div>
+                </div>
+                """, unsafe_allow_html=True)
             
             # 处理结果
             if st.session_state.project_data["files"]:
@@ -1138,33 +1211,40 @@ def main():
                             st.markdown(f"**Original Text:** {file_data['text']}")
                             if "qc_report" in file_data["result"]:
                                 st.markdown(f"**Quality Score:** {file_data['result']['qc_report']['score']}/100")
+            
+            st.markdown("""
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
     
     # 关闭主要内容区域
     st.markdown('</div>', unsafe_allow_html=True)
     
-    # 底部区域
+    # 现代化底部区域
     st.markdown("""
-    <div style="background: #F9FAFB; padding: 2rem; margin-top: 2rem; text-align: center;">
-        <div style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
-            <div>
-                <h3 style="color: #1F2937; margin-bottom: 1rem;">Download Center</h3>
-                <p style="color: #6B7280; font-size: 0.9rem; margin-bottom: 1rem;">
+    <div style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); padding: 4rem 2rem; margin-top: 3rem;">
+        <div style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 3rem;">
+            <div class="modern-card" style="padding: 2rem; text-align: center;">
+                <div style="font-size: 2rem; margin-bottom: 1rem;">📥</div>
+                <h3 style="color: #1a1a1a; margin-bottom: 1rem; font-size: 1.3rem; font-weight: 600;">Download Center</h3>
+                <p style="color: #64748b; font-size: 0.95rem; margin-bottom: 2rem; line-height: 1.6;">
                     All project deliverables will be available for download here upon completion
                 </p>
-                <button style="background: #3B82F6; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; cursor: not-allowed; opacity: 0.5;">
+                <button style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 1rem 2rem; border-radius: 12px; cursor: not-allowed; opacity: 0.6; font-weight: 600; font-size: 0.95rem; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);">
                     📥 Download Project Files
                 </button>
             </div>
-            <div>
-                <h3 style="color: #1F2937; margin-bottom: 1rem;">Transaction History</h3>
-                <div style="background: white; padding: 1rem; border-radius: 8px; border: 1px solid #E5E7EB;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                        <span style="color: #6B7280; font-size: 0.9rem;">AI Workflow Services</span>
-                        <span style="font-weight: 600;">$21.00</span>
+            <div class="modern-card" style="padding: 2rem; text-align: center;">
+                <div style="font-size: 2rem; margin-bottom: 1rem;">💳</div>
+                <h3 style="color: #1a1a1a; margin-bottom: 1rem; font-size: 1.3rem; font-weight: 600;">Transaction History</h3>
+                <div style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(0, 0, 0, 0.05); margin-top: 1rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(0, 0, 0, 0.05);">
+                        <span style="color: #64748b; font-size: 0.9rem; font-weight: 500;">AI Workflow Services</span>
+                        <span style="font-weight: 600; color: #1a1a1a;">$21.00</span>
                     </div>
                     <div style="display: flex; justify-content: space-between;">
-                        <span style="color: #6B7280; font-size: 0.9rem;">Smart Contract Escrow</span>
-                        <span style="font-weight: 600;">$21.00</span>
+                        <span style="color: #64748b; font-size: 0.9rem; font-weight: 500;">Smart Contract Escrow</span>
+                        <span style="font-weight: 600; color: #10b981;">$21.00</span>
                     </div>
                 </div>
             </div>
