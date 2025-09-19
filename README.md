@@ -3,12 +3,12 @@
 
 <div align="center">
 
-[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://your-app-name.streamlit.app)
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://quakers.streamlit.app)
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![GitHub Stars](https://img.shields.io/github/stars/your-username/ai-workflow-platform?style=social)](https://github.com/your-username/ai-workflow-platform)
 
-**[🌐 Live Demo](https://your-app-name.streamlit.app)** • **[📖 Documentation](docs/)** • **[🚀 Quick Start](#quick-start)** • **[⚙️ Admin Panel](/Admin)**
+
+**[🌐 Live Demo](https://quakers.streamlit.app)** • **[📖 Documentation](docs/)** • **[🚀 Quick Start](#quick-start)** • **[⚙️ Admin Panel](/Admin)**
 
 </div>
 
@@ -199,7 +199,7 @@ AI-Workflow-Platform/
 <div align="center">
 
 ### 🌟 **Option 1: One-Click Online Experience**
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://your-app-name.streamlit.app)
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://quakers.streamlit.app)
 
 **No installation required! Click above to try it now.**
 
@@ -213,7 +213,7 @@ AI-Workflow-Platform/
 #### **Streamlit Version (Recommended)**
 ```bash
 # 1. Clone the repository
-git clone https://github.com/your-username/ai-workflow-platform.git
+git clone https://github.com/quakers/ai-workflow-platform.git
 cd ai-workflow-platform
 
 # 2. Install dependencies  
@@ -369,7 +369,7 @@ cd agents/agentB_tts && python run.py
 
 **We welcome contributions from the community!**
 
-[![Contributors](https://img.shields.io/github/contributors/your-username/ai-workflow-platform?style=for-the-badge)](https://github.com/your-username/ai-workflow-platform/graphs/contributors)
+[![Contributors](https://img.shields.io/github/contributors/quakers/ai-workflow-platform?style=for-the-badge)](https://github.com/quakers/ai-workflow-platform/graphs/contributors)
 
 </div>
 
@@ -416,18 +416,6 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 [![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/)
 
 </div>
-
----
-
-<div align="center">
-
-### 🌟 **Star this project if you find it helpful!**
-
-[![GitHub stars](https://img.shields.io/github/stars/your-username/ai-workflow-platform?style=social)](https://github.com/your-username/ai-workflow-platform)
-[![GitHub forks](https://img.shields.io/github/forks/your-username/ai-workflow-platform?style=social)](https://github.com/your-username/ai-workflow-platform)
-[![GitHub watchers](https://img.shields.io/github/watchers/your-username/ai-workflow-platform?style=social)](https://github.com/your-username/ai-workflow-platform)
-
-**Made with ❤️ by the AI Workflow Platform Team**
 
 </div>
 
