@@ -1,217 +1,433 @@
-# Quakers
+# 🤖 AI Multi-Agent Workflow Platform
+### *Intelligent Task Flow Platform with Multi-Agent Collaboration*
 
-智能多Agent任务流平台
+<div align="center">
 
-1. 项目愿景
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://your-app-name.streamlit.app)
+[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![GitHub Stars](https://img.shields.io/github/stars/your-username/ai-workflow-platform?style=social)](https://github.com/your-username/ai-workflow-platform)
 
-实现一个端到端的智能生产线：客户 → 需求澄清 → 任务拆分/报价 → 多 Agent 执行 → 智能合约托管收款 → 打包交付。
-四大模块：
+**[🌐 Live Demo](https://your-app-name.streamlit.app)** • **[📖 Documentation](docs/)** • **[🚀 Quick Start](#quick-start)** • **[⚙️ Admin Panel](/Admin)**
 
-入口与会话：UI + 大模型对话 + 支付
-
-中心处理器：拆分、报价、调度
-
-执行代理：Agent A 图转文、Agent B 文转音
-
-交付与账款：打包输出、智能合约结算
-
-2. 目录结构建议
-   project-root/
-   │
-   ├─ README.md              # 本文件
-   ├─ /docs                  # 设计文档、流程图、API 规范
-   │   ├─ api\_spec.yaml
-   │   ├─ state\_machine.md
-   │   └─ prompt\_templates.md
-   │
-   ├─ /orchestrator          # 中心处理器（FastAPI/NestJS） 
-   │   ├─ main.py
-   │   ├─ routers/
-   │   └─ models/
-   │
-   ├─ /agents
-   │   ├─ agentA\_ocr/        # 图片转文字 (留出API接口)
-   │   ├─ agentB\_tts/        # 文字转语音 (留出API接口)
-   │   └─ auditor/           # 自动审核官  (留出API接口)
-   │
-   ├─ /frontend
-   │   ├─ src/
-   │   └─ public/
-   │
-   ├─ /contracts             # CrossMint 智能合约交互代码
-   │   ├─ escrow.js
-   │   └─ tests/
-   │
-   └─ /tests                 # 端到端与集成测试
-3. 核心流程图
-   flowchart LR
-   A\[客户入口UI] -->|对话澄清| B\[会话Agent]
-   B -->|输出MRD| C\[中心处理器/Orchestrator]
-   C -->|拆分任务/报价| D\[支付后端+CrossMint合约]
-   D -->|资金托管确认| E\[Agent A 图转文]
-   E -->|审核通过释放里程碑1| F\[Agent B 文转音]
-   F -->|审核通过释放里程碑2| G\[打包交付]
-   G -->|最终确认释放尾款| H\[客户下载]
-4. 模块职责与接口
-   4.1 入口页面（UI + 会话Agent + 支付）
-
-收集客户需求、上传文件
-
-与大模型对话生成 MRD（明确需求单）
-
-展示报价、支付、状态轴
-
-4.2 中心处理器 Orchestrator
-
-输入：MRD
-
-输出：任务拆分（Agent A/B）、估时、成本、排期
-
-里程碑管理、状态机、调用智能合约 SDK
-
-4.3 Agent A/B
-
-Agent A：OCR + 清洗 → Markdown
-
-Agent B：TTS → MP3 + VTT 时间轴
-
-输出包含 qc\_report 自检报告
-
-4.4 智能合约（CrossMint）
-
-托管资金、分里程碑释放、仲裁退款
-
-Webhook 回调中心处理器更新状态
-
-5. 核心数据结构
-
-MRD（明确需求单）：目标、输入、输出标准、验收条件、预算、截止时间
-
-Quote（报价单）：任务、工时、费率、缓冲、里程碑比例
-
-Task Ticket（任务工单）：每个 Agent 一张，含输入、期望输出、状态
-
-示例 JSON 见 docs/state\_machine.md。
-
-6. Agent 指令（Prompt 模板）
-
-详见 docs/prompt\_templates.md，包含：
-
-会话Agent：需求澄清问法与输出 JSON (留出API接口)
-
-拆分/报价Agent：任务分解、估时、缓冲 (留出API接口)
-
-Agent A：OCR + Markdown + QC 报告  (留出API接口)
-
-Agent B：TTS + VTT + QC 报告 (留出API接口)
-
-审核官：自动质检与返修建议
-
-7. 运行方式（最小可行示例）
-
-启动 Orchestrator
-
-cd orchestrator
-uvicorn main:app --reload
-
-
-
-启动前端
-
-cd frontend
-npm install \&\& npm run dev
-
-
-
-配置 CrossMint 测试网
-
-在 contracts/escrow.js 中填入 CrossMint API Key/Endpoint
-
-node contracts/test\_escrow.js 测试合约创建与释放
-
-启动 Agent A/B
-
-cd agents/agentA\_ocr \&\& python run.py
-cd agents/agentB\_tts \&\& python run.py
-
-8. 开发里程碑建议
-
-M1：MRD/Quote 流程 + 前端展示
-
-M2：CrossMint 托管资金接口打通
-
-M3：Orchestrator 状态机 + Agent A/B 最小可行实现
-
-M4：打包交付 + 自动审核
-
-M5：端到端测试（docs 中给出的样例）
+</div>
 
 ---
 
-## 🚀 在线体验
+## 🎯 Project Vision
 
-### 🌐 Streamlit Cloud部署版本
-[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://your-app-name.streamlit.app)
-
-**一键体验**: 点击上方徽章直接访问在线版本，无需本地安装！
-
-### 🔧 本地运行
-```bash
-# 1. 克隆项目
-git clone https://github.com/your-username/ai-workflow-platform.git
-cd ai-workflow-platform
-
-# 2. 安装依赖
-pip install -r requirements.txt
-
-# 3. 启动Streamlit应用
-streamlit run streamlit_app.py
+Create an **end-to-end intelligent production pipeline**: 
+```
+Customer → Requirement Clarification → Task Decomposition/Quotation → Multi-Agent Execution → Smart Contract Escrow → Packaged Delivery
 ```
 
-### 🔑 API密钥配置
-在侧边栏中直接配置各种AI服务的API密钥：
-- **OpenAI GPT**: 需要OpenAI API密钥
-- **DeepSeek**: 需要DeepSeek API密钥  
-- **ElevenLabs TTS**: 需要ElevenLabs API密钥
-- **本地模拟**: 无需API密钥，可直接体验
+### 🏗️ Four Core Modules
 
-### 📱 功能特性
-- ✅ **响应式界面**: 自适应桌面和移动设备
-- ✅ **智能对话**: 支持多种大模型
-- ✅ **图像OCR**: 上传图片提取文字
-- ✅ **文本转语音**: 高质量语音合成
-- ✅ **实时报价**: 动态生成项目报价
-- ✅ **进度跟踪**: 可视化任务进展
+| Module | Description | Technologies |
+|--------|-------------|-------------|
+| 🎪 **Entry & Conversation** | UI + LLM Dialogue + Payment | Streamlit, OpenAI, DeepSeek |
+| 🧠 **Central Processor** | Task Splitting, Quotation, Scheduling | FastAPI, Python |
+| 🤖 **Execution Agents** | Agent A (OCR), Agent B (TTS) | PIL, ElevenLabs |
+| 💰 **Delivery & Settlement** | Package Output, Smart Contract | CrossMe, Web3 |
 
-## 📁 项目结构 (Streamlit版本)
+## 📁 Project Structure
+
+<details>
+<summary><b>🔍 Click to expand directory structure</b></summary>
 
 ```
 AI-Workflow-Platform/
-├── 📄 streamlit_app.py      # 主Streamlit应用 ⭐
-├── 📄 requirements.txt      # Python依赖包
-├── 📄 .gitignore           # Git忽略文件
-├── 📁 .streamlit/          # Streamlit配置
-│   ├── config.toml         # 主题和服务器配置
-│   └── secrets.toml.example # API密钥配置示例
-├── 📁 .github/             # GitHub Actions
-│   └── workflows/
-│       └── deploy.yml      # 自动部署配置
-├── 📄 PROJECT_OVERVIEW.md   # 项目全景概览
-├── 📄 readme.md            # 项目说明
-└── 📁 legacy/              # 原版本文件 (保留)
-    ├── frontend/           # 原前端SPA
-    ├── orchestrator/       # 原后端API
-    ├── agents/            # 原智能体服务
-    └── start_project.*    # 原启动脚本
+├── 📄 streamlit_app.py          # 🌟 Main Streamlit Application
+├── 📄 requirements.txt          # Python Dependencies
+├── 📁 pages/                    # Multi-page Application
+│   └── 1_Admin.py              # ⚙️ Admin Dashboard
+├── 📁 .streamlit/              # Streamlit Configuration
+│   ├── config.toml             # Theme & Server Settings
+│   └── secrets.toml.example    # API Keys Template
+├── 📁 .github/workflows/       # CI/CD Pipeline
+│   └── deploy.yml              # Auto-deployment to Streamlit Cloud
+├── 📄 PROJECT_OVERVIEW.md       # 📋 Detailed Project Overview
+├── 📄 DEPLOYMENT.md            # 🚀 Deployment Instructions
+└── 📁 legacy/                  # Original Multi-Service Version
+    ├── frontend/               # SPA Frontend (HTML/CSS/JS)
+    ├── orchestrator/           # FastAPI Backend
+    ├── agents/                 # AI Agent Services
+    │   ├── agentA_ocr/        # 🖼️ Image-to-Text Agent
+    │   ├── agentB_tts/        # 🔊 Text-to-Speech Agent
+    │   └── auditor/           # 🔍 Quality Control Agent
+    ├── contracts/             # 💰 Smart Contract Integration
+    └── tests/                 # 🧪 End-to-End Testing
 ```
 
-### 🔄 版本对比
+</details>
+## 🔄 Core Workflow
 
-| 特性 | 原版本 (多服务) | Streamlit版本 |
-|------|----------------|--------------|
-| 部署方式 | 需要3个服务器 | 单个应用 ✅ |
-| GitHub部署 | 复杂配置 | 一键部署 ✅ |
-| 维护成本 | 高 | 低 ✅ |
-| 用户体验 | 需本地安装 | 在线访问 ✅ |
-| API集成 | 完整支持 | 简化版本 |
-| 扩展性 | 高 | 中等 |
+```mermaid
+   flowchart LR
+    A[🎭 Customer UI] -->|💬 Dialogue Clarification| B[🤖 Conversation Agent]
+    B -->|📋 Output MRD| C[🧠 Central Processor/Orchestrator]
+    C -->|📊 Task Split/Quote| D[💳 Payment Backend + CrossMe Contract]
+    D -->|💰 Fund Escrow Confirmation| E[🖼️ Agent A: Image-to-Text]
+    E -->|✅ Milestone 1 Release| F[🔊 Agent B: Text-to-Speech]
+    F -->|✅ Milestone 2 Release| G[📦 Package Delivery]
+    G -->|🎉 Final Confirmation| H[📥 Customer Download]
+    
+    style A fill:#e1f5fe
+    style B fill:#f3e5f5
+    style C fill:#e8f5e8
+    style D fill:#fff3e0
+    style E fill:#fce4ec
+    style F fill:#f1f8e9
+    style G fill:#e0f2f1
+    style H fill:#e3f2fd
+```
+## 🧩 Module Responsibilities & Interfaces
+
+<table>
+<tr>
+<th width="25%">🎪 Entry Page</th>
+<th width="25%">🧠 Orchestrator</th>
+<th width="25%">🤖 AI Agents</th>
+<th width="25%">💰 Smart Contract</th>
+</tr>
+<tr>
+<td valign="top">
+
+**UI + Conversation + Payment**
+- 📝 Collect customer requirements
+- 📁 File upload handling  
+- 🤖 LLM dialogue for MRD generation
+- 💰 Display quotes & payment
+- 📊 Progress timeline visualization
+
+</td>
+<td valign="top">
+
+**Central Processing Hub**
+- 📋 **Input**: MRD (Requirement Doc)
+- 📤 **Output**: Task decomposition
+- ⏱️ Time estimation & cost calculation
+- 🎯 Milestone management
+- 🔄 State machine orchestration
+- 🔗 Smart contract SDK integration
+
+</td>
+<td valign="top">
+
+**Specialized AI Workers**
+- 🖼️ **Agent A**: OCR + Cleaning → Markdown
+- 🔊 **Agent B**: TTS → MP3 + VTT timeline
+- 📋 **Output**: Results + QC self-report
+- 🔍 **Auditor**: Quality control & feedback
+
+</td>
+<td valign="top">
+
+**CrossMe Integration**
+- 💰 Fund escrow management
+- 🎯 Milestone-based releases
+- ⚖️ Dispute arbitration & refunds
+- 🔔 Webhook callbacks to orchestrator
+- 📊 Transaction status updates
+
+</td>
+</tr>
+</table>
+
+## 📊 Core Data Structures
+
+<details>
+<summary><b>🔍 Click to expand data models</b></summary>
+
+### 📋 MRD (Requirement Document)
+```json
+{
+  "objectives": "Project goals and outcomes",
+  "inputs": "Required files and data",
+  "output_standards": "Quality and format requirements", 
+  "acceptance_criteria": "Success metrics",
+  "budget": "Cost constraints",
+  "deadline": "Timeline requirements"
+}
+```
+
+### 💰 Quote (Pricing Document)
+```json
+{
+  "tasks": ["Agent A: OCR", "Agent B: TTS"],
+  "hours": [2.5, 1.5],
+  "rates": [20.0, 15.0], 
+  "buffer": 0.2,
+  "milestone_ratios": [0.5, 0.3, 0.2]
+}
+```
+
+### 🎫 Task Ticket (Work Order)
+```json
+{
+  "agent_id": "agent_a_ocr",
+  "inputs": "uploaded_image.png",
+  "expected_outputs": "cleaned_text.md",
+  "status": "pending|processing|completed|failed",
+  "qc_report": {"score": 95, "issues": []}
+}
+```
+
+*📖 Detailed examples available in `docs/state_machine.md`*
+
+</details>
+
+## 🎭 Agent Instructions & Prompts
+
+<details>
+<summary><b>🔍 Click to expand prompt templates</b></summary>
+
+| Agent | Responsibility | API Integration |
+|-------|---------------|-----------------|
+| 💬 **Conversation Agent** | Requirement clarification & JSON output | ✅ Ready |
+| 📊 **Decomposition Agent** | Task breakdown, estimation, buffering | ✅ Ready |
+| 🖼️ **Agent A (OCR)** | OCR + Markdown + QC reporting | ✅ Ready |
+| 🔊 **Agent B (TTS)** | TTS + VTT + QC reporting | ✅ Ready |
+| 🔍 **Auditor Agent** | Quality inspection & revision suggestions | 🚧 Planned |
+
+*📖 Complete templates available in `docs/prompt_templates.md`*
+
+</details>
+
+## 🚀 Quick Start
+
+<div align="center">
+
+### 🌟 **Option 1: One-Click Online Experience**
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://your-app-name.streamlit.app)
+
+**No installation required! Click above to try it now.**
+
+</div>
+
+### 💻 **Option 2: Local Development**
+
+<details>
+<summary><b>🔧 Click to expand local setup instructions</b></summary>
+
+#### **Streamlit Version (Recommended)**
+```bash
+# 1. Clone the repository
+git clone https://github.com/your-username/ai-workflow-platform.git
+cd ai-workflow-platform
+
+# 2. Install dependencies  
+pip install -r requirements.txt
+
+# 3. Launch the application
+streamlit run streamlit_app.py
+```
+
+#### **Multi-Service Version (Advanced)**
+```bash
+# 1. Start Orchestrator
+cd orchestrator
+uvicorn main:app --reload
+
+# 2. Start Frontend  
+cd frontend
+npm install && npm run dev
+
+# 3. Configure CrossMe Testnet
+# Fill in CrossMe API Key/Endpoint in contracts/escrow.js
+node contracts/test_escrow.js
+
+# 4. Start AI Agents
+cd agents/agentA_ocr && python run.py
+cd agents/agentB_tts && python run.py
+```
+
+</details>
+
+## 🛣️ Development Roadmap
+
+| Milestone | Status | Description |
+|-----------|--------|-------------|
+| **M1** | ✅ **Complete** | MRD/Quote workflow + Frontend display |
+| **M2** | 🚧 **In Progress** | CrossMe escrow integration |
+| **M3** | ✅ **Complete** | Orchestrator state machine + Agent A/B MVP |
+| **M4** | 🚧 **In Progress** | Package delivery + Auto-audit |
+| **M5** | 📋 **Planned** | End-to-end testing with sample cases |
+
+---
+
+## ✨ Features & Capabilities
+
+<div align="center">
+
+### 🎯 **Core Features**
+
+</div>
+
+<table>
+<tr>
+<td width="50%" align="center">
+
+### 🎪 **User Interface**
+- 🎨 **Responsive Design**: Desktop & mobile optimized
+- 🌙 **Dark/Light Mode**: Automatic theme switching  
+- 📱 **Progressive Web App**: Install as native app
+- 🎭 **Multi-page Architecture**: Clean navigation
+- ⚙️ **Admin Dashboard**: System configuration & analytics
+
+</td>
+<td width="50%" align="center">
+
+### 🤖 **AI Capabilities**
+- 💬 **Smart Conversation**: Multi-LLM support (GPT, DeepSeek, Qianwen)
+- 🖼️ **Image OCR**: Extract text from images with confidence scoring
+- 🔊 **Text-to-Speech**: High-quality voice synthesis with ElevenLabs
+- 📊 **Auto-Quotation**: Dynamic project pricing generation
+- 🔍 **Quality Control**: Automated QC reports and scoring
+
+</td>
+</tr>
+<tr>
+<td align="center">
+
+### 💰 **Business Logic**
+- 📋 **Project Management**: End-to-end workflow tracking
+- 💳 **Smart Contracts**: CrossMe blockchain escrow integration
+- 📈 **Real-time Analytics**: Live project statistics and metrics
+- 🎯 **Milestone System**: Automated payment releases
+- 📦 **Package Delivery**: Organized result downloads
+
+</td>
+<td align="center">
+
+### 🔧 **Technical Stack**
+- 🐍 **Python**: Streamlit, FastAPI, Pandas
+- 🧠 **AI/ML**: OpenAI, ElevenLabs, PIL, OCR engines
+- 🎨 **Frontend**: HTML5, CSS3, JavaScript ES6+
+- ⚡ **Performance**: Async processing, caching, optimization
+- 🚀 **Deployment**: GitHub Actions, Streamlit Cloud
+
+</td>
+</tr>
+</table>
+
+### 🔑 **API Integration Support**
+
+<div align="center">
+
+| Service | Status | Description | Configuration |
+|---------|--------|-------------|---------------|
+| 🤖 **OpenAI GPT** | ✅ Ready | Advanced language models | API Key required |
+| 🚀 **DeepSeek** | ✅ Ready | Cost-effective AI reasoning | API Key required |
+| 🧠 **Qianwen** | ✅ Ready | Multilingual AI capabilities | API Key required |
+| 🔊 **ElevenLabs** | ✅ Ready | Premium voice synthesis | API Key required |
+| 🎭 **Local Mock** | ✅ Ready | No-cost testing environment | No setup needed |
+
+</div>
+
+## 🔄 Architecture Comparison
+
+<div align="center">
+
+### **Streamlit vs Multi-Service Architecture**
+
+</div>
+
+<table>
+<tr>
+<th width="20%">🏗️ **Aspect**</th>
+<th width="40%">🏢 **Multi-Service Version**</th>
+<th width="40%">⚡ **Streamlit Version**</th>
+</tr>
+<tr>
+<td align="center"><b>🚀 Deployment</b></td>
+<td>❌ Requires 3+ separate servers<br>❌ Complex orchestration needed<br>❌ Multiple service management</td>
+<td>✅ Single application deployment<br>✅ One-click GitHub integration<br>✅ Automatic cloud hosting</td>
+</tr>
+<tr>
+<td align="center"><b>💻 Development</b></td>
+<td>❌ High maintenance overhead<br>❌ Service coordination complexity<br>✅ Full microservice flexibility</td>
+<td>✅ Low maintenance overhead<br>✅ Simplified development workflow<br>✅ Rapid prototyping capability</td>
+</tr>
+<tr>
+<td align="center"><b>👥 User Experience</b></td>
+<td>❌ Requires local installation<br>❌ Complex setup process<br>✅ Full API integration support</td>
+<td>✅ Instant online access<br>✅ Zero installation required<br>✅ Mobile-optimized interface</td>
+</tr>
+<tr>
+<td align="center"><b>📈 Scalability</b></td>
+<td>✅ High scalability potential<br>✅ Independent service scaling<br>✅ Enterprise-grade architecture</td>
+<td>✅ Medium scalability<br>✅ Streamlit Cloud auto-scaling<br>✅ Suitable for most use cases</td>
+</tr>
+</table>
+
+---
+
+## 🤝 Contributing
+
+<div align="center">
+
+**We welcome contributions from the community!**
+
+[![Contributors](https://img.shields.io/github/contributors/your-username/ai-workflow-platform?style=for-the-badge)](https://github.com/your-username/ai-workflow-platform/graphs/contributors)
+
+</div>
+
+### 🛠️ **How to Contribute**
+
+1. **🍴 Fork** the repository
+2. **🌿 Create** a feature branch (`git checkout -b feature/AmazingFeature`)
+3. **💾 Commit** your changes (`git commit -m 'Add some AmazingFeature'`)
+4. **📤 Push** to the branch (`git push origin feature/AmazingFeature`)
+5. **🔄 Open** a Pull Request
+
+### 📋 **Contribution Areas**
+
+- 🐛 **Bug Fixes**: Report and fix issues
+- ✨ **New Features**: Enhance functionality
+- 📚 **Documentation**: Improve guides and examples
+- 🧪 **Testing**: Add test cases and scenarios
+- 🎨 **UI/UX**: Design improvements and accessibility
+- 🔗 **Integrations**: New AI service connections
+
+---
+
+## 📄 License
+
+<div align="center">
+
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+
+</div>
+
+---
+
+## 🙏 Acknowledgments
+
+<div align="center">
+
+**Special thanks to the amazing tools and services that make this project possible:**
+
+[![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://streamlit.io/)
+[![OpenAI](https://img.shields.io/badge/OpenAI-412991?style=for-the-badge&logo=openai&logoColor=white)](https://openai.com/)
+[![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org/)
+[![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/)
+
+</div>
+
+---
+
+<div align="center">
+
+### 🌟 **Star this project if you find it helpful!**
+
+[![GitHub stars](https://img.shields.io/github/stars/your-username/ai-workflow-platform?style=social)](https://github.com/your-username/ai-workflow-platform)
+[![GitHub forks](https://img.shields.io/github/forks/your-username/ai-workflow-platform?style=social)](https://github.com/your-username/ai-workflow-platform)
+[![GitHub watchers](https://img.shields.io/github/watchers/your-username/ai-workflow-platform?style=social)](https://github.com/your-username/ai-workflow-platform)
+
+**Made with ❤️ by the AI Workflow Platform Team**
+
+</div>
+
