@@ -19,7 +19,7 @@ from PIL import Image
 
 # 页面配置
 st.set_page_config(
-    page_title="智能化多Agent协作平台",
+    page_title="AI Multi-Agent Workflow Platform",
     page_icon="🤖",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -40,6 +40,60 @@ st.markdown("""
         padding-bottom: 0;
         max-width: 100%;
         margin: 0;
+    }
+    
+    /* 隐藏Streamlit默认组件样式 */
+    .stButton > button {
+        width: 100%;
+        border-radius: 8px;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+        color: white;
+        box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+    }
+    
+    .stButton > button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+    
+    .stTextInput > div > div > input {
+        border-radius: 8px;
+        border: 1px solid #D1D5DB;
+        padding: 0.75rem;
+        font-size: 0.9rem;
+    }
+    
+    .stTextInput > div > div > input:focus {
+        border-color: #3B82F6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .stTextArea > div > div > textarea {
+        border-radius: 8px;
+        border: 1px solid #D1D5DB;
+        padding: 0.75rem;
+        font-size: 0.9rem;
+    }
+    
+    .stSelectbox > div > div > div {
+        border-radius: 8px;
+    }
+    
+    .stFileUploader > div {
+        border-radius: 8px;
+        border: 2px dashed #D1D5DB;
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+    
+    .stFileUploader > div:hover {
+        border-color: #3B82F6;
+        background: #F8FAFC;
     }
     
     /* 顶部导航栏 */
@@ -530,23 +584,23 @@ class LLMService:
             return {"error": f"API call failed: {str(e)}"}
     
     def _mock_response(self, message: str) -> Dict:
-        """模拟回复"""
+        """Mock AI response"""
         message_lower = message.lower()
         
-        if any(word in message_lower for word in ["图片", "图像", "照片", "ocr", "识别", "文字"]):
+        if any(word in message_lower for word in ["image", "picture", "photo", "ocr", "text recognition", "extract"]):
             return {
-                "content": "我看到您提到了图像处理需求。我可以帮您使用OCR技术识别图像中的文字，并将其转换为Markdown格式。请上传您的图像文件。",
-                "suggestions": ["上传图像文件", "查看OCR服务详情", "获取报价"]
+                "content": "I see you mentioned image processing needs. I can help you use OCR technology to recognize text in images and convert it to Markdown format. Please upload your image file.",
+                "suggestions": ["Upload Image File", "View OCR Service Details", "Get Quote"]
             }
-        elif any(word in message_lower for word in ["语音", "音频", "tts", "朗读", "播放"]):
+        elif any(word in message_lower for word in ["voice", "audio", "tts", "speech", "sound"]):
             return {
-                "content": "我了解您需要文本转语音服务。我可以将您的文本转换为高质量的语音文件。请输入您要转换的文本内容。",
-                "suggestions": ["输入文本内容", "选择语音类型", "试听语音样本"]
+                "content": "I understand you need text-to-speech services. I can convert your text into high-quality audio files. Please enter the text content you want to convert.",
+                "suggestions": ["Enter Text Content", "Choose Voice Type", "Preview Voice Sample"]
             }
         else:
             return {
-                "content": "您好！我是AI工作流平台的智能助手。我可以帮您处理：\n\n🖼️ **图像文字识别**：将图片中的文字转换为Markdown格式\n🔊 **文本转语音**：将文本转换为高质量语音文件\n\n请告诉我您需要什么帮助。",
-                "suggestions": ["上传图像文件", "输入要转换的文本", "查看服务价格"]
+                "content": "Hello! I'm the AI assistant for the workflow platform. I can help you with:\n\n🖼️ **Image Text Recognition**: Convert text in images to Markdown format\n🔊 **Text-to-Speech**: Convert text to high-quality audio files\n\nPlease tell me what you need help with.",
+                "suggestions": ["Upload Image File", "Enter Text to Convert", "View Service Pricing"]
             }
     
     async def _call_openai(self, message: str, api_key: str, history: List) -> Dict:
@@ -709,15 +763,14 @@ def main():
     <div class="top-nav">
         <div class="nav-brand">
             <div class="nav-brand-icon">AI</div>
-            <span>AI工作流</span>
+            <span>AI Workflow</span>
         </div>
         <div class="nav-menu">
-            <a href="#" class="nav-link">工作流程</a>
-            <a href="#" class="nav-link">我的订单</a>
+            <a href="#" class="nav-link">How it Works</a>
+            <a href="#" class="nav-link">My Orders</a>
         </div>
         <div class="nav-actions">
-            <span style="color: #6B7280; font-size: 0.9rem;">中</span>
-            <span style="color: #6B7280; font-size: 0.9rem;">简</span>
+            <span style="color: #6B7280; font-size: 0.9rem;">EN</span>
             <span style="color: #6B7280; font-size: 0.9rem;">⭐</span>
         </div>
     </div>
@@ -726,10 +779,10 @@ def main():
     # Hero区域
     st.markdown("""
     <div class="hero-section">
-        <h1 class="hero-title">智能化多Agent协作平台</h1>
-        <p class="hero-subtitle">从需求澄清到内容交付，AI Agent协作让工作流程更高效</p>
+        <h1 class="hero-title">AI Multi-Agent Workflow Platform</h1>
+        <p class="hero-subtitle">From requirement clarification to content delivery, AI Agents make workflows more efficient</p>
         <a href="#main-content" class="hero-cta">
-            开始项目 →
+            Start Project →
         </a>
     </div>
     """, unsafe_allow_html=True)
@@ -760,283 +813,288 @@ def main():
     # 主要内容区域 - 三个卡片
     st.markdown('<div id="main-content" class="main-content">', unsafe_allow_html=True)
     
-    # 第一个卡片：智能对话
+    # 创建三列布局
     col1, col2, col3 = st.columns([1, 1, 1])
     
+    # 第一个卡片：智能对话
     with col1:
-        st.markdown("""
-        <div class="card">
-            <div class="card-header">
-                💬 智能对话
-                <span style="background: #10B981; color: white; padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.8rem; margin-left: auto;">已连接</span>
-            </div>
-            <div class="card-body">
-                <div class="chat-container" id="chat-container">
-        """, unsafe_allow_html=True)
-        
-        # 显示聊天消息
-        for message in st.session_state.messages:
-            if message["role"] == "user":
-                st.markdown(f"""
-                <div class="chat-message user">
-                    <div class="chat-bubble user">{message["content"]}</div>
-                    <div class="chat-avatar user">👤</div>
-                </div>
-                """, unsafe_allow_html=True)
-            else:
-                st.markdown(f"""
-                <div class="chat-message">
-                    <div class="chat-avatar assistant">🤖</div>
-                    <div class="chat-bubble assistant">{message["content"]}</div>
-                </div>
-                """, unsafe_allow_html=True)
-        
-        st.markdown("</div>", unsafe_allow_html=True)
-        
-        # 文件上传区域
-        uploaded_file = st.file_uploader(
-            "",
-            type=['png', 'jpg', 'jpeg', 'pdf'],
-            help="支持PNG、JPG、JPEG、PDF格式",
-            label_visibility="collapsed"
-        )
-        
-        if uploaded_file is not None:
+        with st.container():
             st.markdown("""
-            <div style="background: #F0F9FF; padding: 1rem; border-radius: 8px; margin: 1rem 0; border: 1px solid #0EA5E9;">
-                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                    <span style="color: #0EA5E9;">📁</span>
-                    <span style="font-size: 0.9rem; color: #1F2937;">""" + uploaded_file.name + """</span>
+            <div class="card">
+                <div class="card-header">
+                    💬 Smart Conversation
+                    <span style="background: #10B981; color: white; padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.8rem; margin-left: auto;">Connected</span>
                 </div>
             </div>
             """, unsafe_allow_html=True)
             
-            if st.button("🔍 开始OCR识别", key="ocr_btn"):
-                with st.spinner("正在识别图像中的文字..."):
-                    image_data = uploaded_file.read()
-                    ocr_result = services['ocr'].extract_text_mock(image_data)
-                    
-                    if ocr_result["status"] == "completed":
-                        st.session_state.project_data["files"].append({
-                            "type": "ocr",
-                            "filename": uploaded_file.name,
-                            "result": ocr_result
-                        })
+            # 聊天容器
+            chat_container = st.container()
+            with chat_container:
+                st.markdown('<div class="chat-container">', unsafe_allow_html=True)
+                
+                # 显示聊天消息
+                for message in st.session_state.messages:
+                    if message["role"] == "user":
+                        st.markdown(f"""
+                        <div class="chat-message user">
+                            <div class="chat-bubble user">{message["content"]}</div>
+                            <div class="chat-avatar user">👤</div>
+                        </div>
+                        """, unsafe_allow_html=True)
+                    else:
+                        st.markdown(f"""
+                        <div class="chat-message">
+                            <div class="chat-avatar assistant">🤖</div>
+                            <div class="chat-bubble assistant">{message["content"]}</div>
+                        </div>
+                        """, unsafe_allow_html=True)
+                
+                st.markdown('</div>', unsafe_allow_html=True)
+            
+            # 文件上传区域
+            st.markdown("**📁 Upload Files**")
+            uploaded_file = st.file_uploader(
+                "Choose an image file",
+                type=['png', 'jpg', 'jpeg', 'pdf'],
+                help="Supports PNG, JPG, JPEG, PDF formats",
+                key="file_uploader"
+            )
+            
+            if uploaded_file is not None:
+                st.success(f"📁 File uploaded: {uploaded_file.name}")
+                
+                if st.button("🔍 Start OCR Recognition", key="ocr_btn"):
+                    with st.spinner("Recognizing text in image..."):
+                        image_data = uploaded_file.read()
+                        ocr_result = services['ocr'].extract_text_mock(image_data)
                         
-                        st.session_state.messages.append({
-                            "role": "user",
-                            "content": f"上传了图像文件: {uploaded_file.name}"
-                        })
-                        st.session_state.messages.append({
-                            "role": "assistant", 
-                            "content": f"✅ OCR识别完成！\n\n**识别结果:**\n{ocr_result['extracted_text']}\n\n**质量评分:** {ocr_result['qc_report']['score']}/100"
-                        })
-                        st.rerun()
-        
-        # 聊天输入
-        user_input = st.text_input("", placeholder="输入您的需求...", key="chat_input", label_visibility="collapsed")
-        
-        if st.button("发送", key="send_message") and user_input:
-            st.session_state.messages.append({"role": "user", "content": user_input})
+                        if ocr_result["status"] == "completed":
+                            st.session_state.project_data["files"].append({
+                                "type": "ocr",
+                                "filename": uploaded_file.name,
+                                "result": ocr_result
+                            })
+                            
+                            st.session_state.messages.append({
+                                "role": "user",
+                                "content": f"Uploaded image file: {uploaded_file.name}"
+                            })
+                            st.session_state.messages.append({
+                                "role": "assistant", 
+                                "content": f"✅ OCR Recognition Completed!\n\n**Extracted Text:**\n{ocr_result['extracted_text']}\n\n**Quality Score:** {ocr_result['qc_report']['score']}/100"
+                            })
+                            st.rerun()
             
-            with st.spinner("AI正在思考..."):
-                response = services['llm']._mock_response(user_input)
-                ai_response = response["content"]
-                st.session_state.messages.append({"role": "assistant", "content": ai_response})
-                st.rerun()
-        
-        st.markdown("</div></div>", unsafe_allow_html=True)
+            # 聊天输入
+            st.markdown("**💭 Chat Input**")
+            user_input = st.text_input(
+                "Enter your message:",
+                placeholder="Type your request here...",
+                key="chat_input"
+            )
+            
+            if st.button("Send Message", key="send_message") and user_input:
+                st.session_state.messages.append({"role": "user", "content": user_input})
+                
+                with st.spinner("AI is thinking..."):
+                    response = services['llm']._mock_response(user_input)
+                    ai_response = response["content"]
+                    st.session_state.messages.append({"role": "assistant", "content": ai_response})
+                    st.rerun()
     
+    # 第二个卡片：报价与支付
     with col2:
-        st.markdown("""
-        <div class="card">
-            <div class="card-header">
-                💰 报价与支付
-                <span style="background: #F59E0B; color: white; padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.8rem; margin-left: auto;">待付款</span>
-            </div>
-            <div class="card-body">
-        """, unsafe_allow_html=True)
-        
-        # 生成报价按钮
-        if st.button("📊 生成项目报价", key="generate_quote"):
-            quote = {
-                "quote_id": str(uuid.uuid4()),
-                "tasks": [
-                    {
-                        "name": "图像文字识别",
-                        "description": "将图像中的文字识别并转换为Markdown格式",
-                        "price": 52.00,
-                        "estimated_time": "5-10分钟",
-                        "agent": "Agent A"
-                    },
-                    {
-                        "name": "文本转语音",
-                        "description": "将文本转换为高质量语音文件",
-                        "price": 8.00,
-                        "estimated_time": "3-5分钟", 
-                        "agent": "Agent B"
-                    }
-                ],
-                "total_price": 21.00,
-                "currency": "CNY",
-                "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            }
-            st.session_state.project_data["quotes"].append(quote)
-        
-        # 显示报价表格
-        if st.session_state.project_data["quotes"]:
-            latest_quote = st.session_state.project_data["quotes"][-1]
-            
+        with st.container():
             st.markdown("""
-            <table class="quote-table">
-                <thead>
-                    <tr>
-                        <th>服务项目</th>
-                        <th>执行方</th>
-                        <th>预计时间</th>
-                        <th>价格</th>
-                    </tr>
-                </thead>
-                <tbody>
-            """, unsafe_allow_html=True)
-            
-            for task in latest_quote["tasks"]:
-                icon = "📄" if "图像" in task["name"] else "🎵"
-                st.markdown(f"""
-                <tr>
-                    <td><span class="service-icon">{icon}</span>{task["name"]}</td>
-                    <td>{task["agent"]}</td>
-                    <td>{task["estimated_time"]}</td>
-                    <td class="price">¥{task["price"]:.2f}</td>
-                </tr>
-                """, unsafe_allow_html=True)
-            
-            st.markdown("</tbody></table>", unsafe_allow_html=True)
-            
-            # 小计和总计
-            st.markdown(f"""
-            <div style="padding: 0.5rem 0; border-bottom: 1px solid #F3F4F6; display: flex; justify-content: space-between;">
-                <span>小计</span>
-                <span>¥{sum(task['price'] for task in latest_quote['tasks']):.2f}</span>
-            </div>
-            <div style="padding: 0.5rem 0; border-bottom: 1px solid #F3F4F6; display: flex; justify-content: space-between;">
-                <span>平台费 (5%)</span>
-                <span>¥1.00</span>
-            </div>
-            <div class="quote-total">
-                <span>总计</span>
-                <span class="total-price">¥{latest_quote['total_price']:.2f}</span>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            # 智能合约支付区域
-            st.markdown("""
-            <div style="background: #ECFDF5; padding: 1rem; border-radius: 8px; border: 1px solid #10B981; margin: 1rem 0;">
-                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
-                    <span style="color: #10B981; font-weight: 600;">💎 智能合约托管</span>
-                    <span style="background: #10B981; color: white; padding: 0.2rem 0.4rem; border-radius: 4px; font-size: 0.7rem;">已部署</span>
+            <div class="card">
+                <div class="card-header">
+                    💰 Quote & Payment
+                    <span style="background: #F59E0B; color: white; padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.8rem; margin-left: auto;">Pending</span>
                 </div>
-                <p style="font-size: 0.85rem; color: #065F46; margin: 0;">
-                    资金将通过CrossMe智能合约托管，项目完成后自动释放给服务商
-                </p>
-                <p style="font-size: 0.8rem; color: #6B7280; margin: 0.5rem 0 0 0;">
-                    合约地址：0x742d35Cc6aB8C0532Df4f3d...
-                </p>
             </div>
             """, unsafe_allow_html=True)
             
-            # 支付按钮
-            if st.button("💳 立即支付 ¥21.00", key="payment_btn"):
-                st.session_state.project_data["payment_status"] = "completed"
-                st.success("✅ 支付成功！项目已启动")
+            # 生成报价按钮
+            st.markdown("**📊 Generate Quote**")
+            if st.button("Generate Project Quote", key="generate_quote"):
+                quote = {
+                    "quote_id": str(uuid.uuid4()),
+                    "tasks": [
+                        {
+                            "name": "Image Text Recognition",
+                            "description": "Recognize text in images and convert to Markdown format",
+                            "price": 52.00,
+                            "estimated_time": "5-10 minutes",
+                            "agent": "Agent A"
+                        },
+                        {
+                            "name": "Text-to-Speech",
+                            "description": "Convert text to high-quality audio files",
+                            "price": 8.00,
+                            "estimated_time": "3-5 minutes", 
+                            "agent": "Agent B"
+                        }
+                    ],
+                    "total_price": 21.00,
+                    "currency": "USD",
+                    "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                }
+                st.session_state.project_data["quotes"].append(quote)
                 st.rerun()
-        
-        else:
-            # 空状态
-            st.markdown("""
-            <div style="text-align: center; padding: 2rem; color: #9CA3AF;">
-                <div style="font-size: 2rem; margin-bottom: 1rem;">📊</div>
-                <p>点击"生成项目报价"开始</p>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        st.markdown("</div></div>", unsafe_allow_html=True)
-    
-    with col3:
-        st.markdown("""
-        <div class="card">
-            <div class="card-header">
-                📈 执行进度
-                <span style="color: #3B82F6; font-size: 0.8rem; margin-left: auto;">2/6 完成</span>
-            </div>
-            <div class="card-body">
-        """, unsafe_allow_html=True)
-        
-        # 进度时间轴
-        timeline_stages = [
-            {"name": "需求澄清", "status": "completed", "progress": "100%", "desc": "AI对话理解需求"},
-            {"name": "报价生成", "status": "completed" if st.session_state.project_data["quotes"] else "waiting", "progress": "100%" if st.session_state.project_data["quotes"] else "0%", "desc": "自动生成服务报价"},
-            {"name": "智能支付", "status": "completed" if st.session_state.project_data.get("payment_status") == "completed" else "waiting", "progress": "100%" if st.session_state.project_data.get("payment_status") == "completed" else "0%", "desc": "CrossMe合约托管"},
-            {"name": "Agent A执行", "status": "pending" if st.session_state.project_data.get("payment_status") == "completed" else "waiting", "progress": "0%", "desc": "图像文字识别处理"},
-            {"name": "Agent B执行", "status": "waiting", "progress": "0%", "desc": "文本转语音合成"},
-            {"name": "成果打包", "status": "waiting", "progress": "0%", "desc": "整理交付成果"}
-        ]
-        
-        st.markdown('<div class="timeline">', unsafe_allow_html=True)
-        
-        for stage in timeline_stages:
-            if stage["status"] == "completed":
-                icon = "✅"
-                css_class = "completed"
-            elif stage["status"] == "pending":
-                icon = "⏳"
-                css_class = "pending"
-            else:
-                icon = stage["progress"]
-                css_class = "waiting"
             
-            st.markdown(f"""
-            <div class="timeline-item">
-                <div class="timeline-icon {css_class}">{icon if stage['status'] != 'waiting' else '○'}</div>
-                <div class="timeline-content">
-                    <div class="timeline-title">{stage['name']}</div>
-                    <div class="timeline-description">{stage['desc']}</div>
-                    <div class="timeline-progress">{stage['progress']}</div>
+            # 显示报价
+            if st.session_state.project_data["quotes"]:
+                latest_quote = st.session_state.project_data["quotes"][-1]
+                
+                st.markdown("**📋 Quote Details**")
+                
+                # 服务表格
+                quote_data = []
+                for task in latest_quote["tasks"]:
+                    quote_data.append({
+                        "Service": task["name"],
+                        "Agent": task["agent"],
+                        "Time": task["estimated_time"],
+                        "Price": f"${task['price']:.2f}"
+                    })
+                
+                st.table(quote_data)
+                
+                # 总计
+                subtotal = sum(task['price'] for task in latest_quote['tasks'])
+                platform_fee = 1.00
+                total = latest_quote['total_price']
+                
+                st.markdown("**💳 Payment Summary**")
+                col_a, col_b = st.columns([2, 1])
+                with col_a:
+                    st.write("Subtotal:")
+                    st.write("Platform Fee (5%):")
+                    st.write("**Total:**")
+                with col_b:
+                    st.write(f"${subtotal:.2f}")
+                    st.write(f"${platform_fee:.2f}")
+                    st.write(f"**${total:.2f}**")
+                
+                # 智能合约信息
+                st.info("💎 **Smart Contract Escrow**\nFunds will be held in CrossMe smart contract and released automatically upon project completion.")
+                
+                # 支付按钮
+                if st.button(f"💳 Pay ${total:.2f}", key="payment_btn"):
+                    st.session_state.project_data["payment_status"] = "completed"
+                    st.success("✅ Payment successful! Project started.")
+                    st.rerun()
+            
+            else:
+                st.info("Click 'Generate Project Quote' to start")
+            
+            # TTS功能
+            st.markdown("**🎵 Text-to-Speech Service**")
+            tts_text = st.text_area(
+                "Enter text to convert:",
+                height=100,
+                placeholder="Type or paste your text here..."
+            )
+            
+            if st.button("🔊 Generate Speech", key="tts_btn") and tts_text:
+                with st.spinner("Generating speech..."):
+                    tts_result = services['tts'].generate_tts_mock(tts_text, st.session_state.voice_id)
+                    
+                    if "error" in tts_result:
+                        st.error(f"❌ {tts_result['error']}")
+                    else:
+                        st.success("✅ Speech generated successfully!")
+                        
+                        # 显示QC报告
+                        if "qc_report" in tts_result:
+                            qc = tts_result["qc_report"]
+                            st.markdown(f"""
+                            **QC Quality Report:**
+                            - Overall Score: {qc['score']}/100
+                            - Audio Quality: {qc['audio_quality']}/100
+                            - Text Accuracy: {qc['text_accuracy']}/100
+                            - Voice Consistency: {qc['voice_consistency']}/100
+                            """)
+                        
+                        # 保存到项目数据
+                        st.session_state.project_data["files"].append({
+                            "type": "tts",
+                            "text": tts_text,
+                            "result": tts_result
+                        })
+    
+    # 第三个卡片：项目进度
+    with col3:
+        with st.container():
+            st.markdown("""
+            <div class="card">
+                <div class="card-header">
+                    📈 Project Progress
+                    <span style="color: #3B82F6; font-size: 0.8rem; margin-left: auto;">2/6 Complete</span>
                 </div>
             </div>
             """, unsafe_allow_html=True)
-        
-        st.markdown('</div>', unsafe_allow_html=True)
-        
-        # 项目统计
-        st.markdown("""
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-number">""" + str(len(st.session_state.project_data['files'])) + """</div>
-                <div class="stat-label">已处理文件</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">""" + str(len(st.session_state.project_data['quotes'])) + """</div>
-                <div class="stat-label">生成报价</div>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        # 处理结果
-        if st.session_state.project_data["files"]:
-            st.markdown('<h4 style="margin-bottom: 1rem; color: #1F2937;">📁 处理结果</h4>', unsafe_allow_html=True)
-            for i, file_data in enumerate(st.session_state.project_data["files"]):
-                with st.expander(f"{file_data['type'].upper()} - {file_data.get('filename', f'任务{i+1}')}"):
-                    if file_data["type"] == "ocr":
-                        st.markdown("**识别文本:**")
-                        st.text_area("", value=file_data["result"]["extracted_text"], height=100, disabled=True, key=f"ocr_{i}")
-                        st.markdown(f"**置信度:** {file_data['result']['confidence']:.2%}")
-                    elif file_data["type"] == "tts":
-                        st.markdown(f"**原文本:** {file_data['text']}")
-                        if "qc_report" in file_data["result"]:
-                            st.markdown(f"**质量评分:** {file_data['result']['qc_report']['score']}/100")
-        
-        st.markdown("</div></div>", unsafe_allow_html=True)
+            
+            # 进度时间轴
+            st.markdown("**🔄 Workflow Timeline**")
+            
+            timeline_stages = [
+                {"name": "Requirements", "status": "completed", "desc": "AI conversation understanding"},
+                {"name": "Quote Generation", "status": "completed" if st.session_state.project_data["quotes"] else "waiting", "desc": "Auto-generate service quote"},
+                {"name": "Smart Payment", "status": "completed" if st.session_state.project_data.get("payment_status") == "completed" else "waiting", "desc": "CrossMe contract escrow"},
+                {"name": "Agent A Execution", "status": "pending" if st.session_state.project_data.get("payment_status") == "completed" else "waiting", "desc": "Image text recognition"},
+                {"name": "Agent B Execution", "status": "waiting", "desc": "Text-to-speech synthesis"},
+                {"name": "Result Packaging", "status": "waiting", "desc": "Prepare final deliverables"}
+            ]
+            
+            for i, stage in enumerate(timeline_stages):
+                if stage["status"] == "completed":
+                    icon = "✅"
+                    progress = 100
+                elif stage["status"] == "pending":
+                    icon = "⏳"
+                    progress = 50
+                else:
+                    icon = "○"
+                    progress = 0
+                
+                st.markdown(f"""
+                <div style="display: flex; align-items: center; margin-bottom: 1rem; padding: 0.75rem; background: {'#ECFDF5' if stage['status'] == 'completed' else '#FFF7ED' if stage['status'] == 'pending' else '#F9FAFB'}; border-radius: 8px;">
+                    <div style="margin-right: 1rem; font-size: 1.2rem;">{icon}</div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600; color: #1F2937;">{stage['name']}</div>
+                        <div style="font-size: 0.85rem; color: #6B7280;">{stage['desc']}</div>
+                    </div>
+                    <div style="font-size: 0.85rem; color: #3B82F6; font-weight: 500;">{progress}%</div>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                if progress > 0:
+                    st.progress(progress / 100)
+            
+            # 项目统计
+            st.markdown("**📊 Project Statistics**")
+            
+            col_a, col_b = st.columns(2)
+            with col_a:
+                st.metric("Files Processed", len(st.session_state.project_data['files']))
+            with col_b:
+                st.metric("Quotes Generated", len(st.session_state.project_data['quotes']))
+            
+            # 处理结果
+            if st.session_state.project_data["files"]:
+                st.markdown("**📁 Processing Results**")
+                for i, file_data in enumerate(st.session_state.project_data["files"]):
+                    with st.expander(f"{file_data['type'].upper()} - {file_data.get('filename', f'Task {i+1}')}"):
+                        if file_data["type"] == "ocr":
+                            st.markdown("**Extracted Text:**")
+                            st.text_area("", value=file_data["result"]["extracted_text"], height=100, disabled=True, key=f"ocr_{i}")
+                            st.markdown(f"**Confidence:** {file_data['result']['confidence']:.2%}")
+                        elif file_data["type"] == "tts":
+                            st.markdown(f"**Original Text:** {file_data['text']}")
+                            if "qc_report" in file_data["result"]:
+                                st.markdown(f"**Quality Score:** {file_data['result']['qc_report']['score']}/100")
     
     # 关闭主要内容区域
     st.markdown('</div>', unsafe_allow_html=True)
@@ -1046,24 +1104,24 @@ def main():
     <div style="background: #F9FAFB; padding: 2rem; margin-top: 2rem; text-align: center;">
         <div style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
             <div>
-                <h3 style="color: #1F2937; margin-bottom: 1rem;">下载中心</h3>
+                <h3 style="color: #1F2937; margin-bottom: 1rem;">Download Center</h3>
                 <p style="color: #6B7280; font-size: 0.9rem; margin-bottom: 1rem;">
-                    完成项目后，所有成果将在此处提供下载
+                    All project deliverables will be available for download here upon completion
                 </p>
                 <button style="background: #3B82F6; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; cursor: not-allowed; opacity: 0.5;">
-                    📥 下载项目文件
+                    📥 Download Project Files
                 </button>
             </div>
             <div>
-                <h3 style="color: #1F2937; margin-bottom: 1rem;">交易记录</h3>
+                <h3 style="color: #1F2937; margin-bottom: 1rem;">Transaction History</h3>
                 <div style="background: white; padding: 1rem; border-radius: 8px; border: 1px solid #E5E7EB;">
                     <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                        <span style="color: #6B7280; font-size: 0.9rem;">社交媒体</span>
-                        <span style="font-weight: 600;">¥21.00</span>
+                        <span style="color: #6B7280; font-size: 0.9rem;">AI Workflow Services</span>
+                        <span style="font-weight: 600;">$21.00</span>
                     </div>
                     <div style="display: flex; justify-content: space-between;">
-                        <span style="color: #6B7280; font-size: 0.9rem;">智能合约托管</span>
-                        <span style="font-weight: 600;">¥21.00</span>
+                        <span style="color: #6B7280; font-size: 0.9rem;">Smart Contract Escrow</span>
+                        <span style="font-weight: 600;">$21.00</span>
                     </div>
                 </div>
             </div>
