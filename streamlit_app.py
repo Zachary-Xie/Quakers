@@ -19,45 +19,331 @@ from PIL import Image
 
 # 页面配置
 st.set_page_config(
-    page_title="AI多智能体工作流平台",
+    page_title="AI Multi-Agent Workflow Platform",
     page_icon="🤖",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# 自定义CSS样式
+# 自定义CSS样式 - 参考原版设计
 st.markdown("""
 <style>
+    /* 主题色彩 */
+    :root {
+        --primary-color: #3B82F6;
+        --accent-color: #9333EA;
+        --success-color: #10B981;
+        --background-color: #F9FAFB;
+        --card-background: #FFFFFF;
+        --text-primary: #1F2937;
+        --text-secondary: #6B7280;
+        --border-color: #E5E7EB;
+    }
+    
+    /* 隐藏Streamlit默认元素 */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+    
+    /* 主容器样式 */
+    .main .block-container {
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+        max-width: 1400px;
+    }
+    
+    /* 主标题样式 */
     .main-header {
         text-align: center;
-        color: #2E86AB;
-        margin-bottom: 2rem;
+        color: var(--primary-color);
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
-    .chat-message {
-        padding: 1rem;
-        border-radius: 0.5rem;
-        margin: 0.5rem 0;
-    }
-    .user-message {
-        background-color: #E3F2FD;
-        margin-left: 2rem;
-    }
-    .assistant-message {
-        background-color: #F5F5F5;
-        margin-right: 2rem;
-    }
-    .status-card {
-        background-color: #F8F9FA;
-        padding: 1rem;
-        border-radius: 0.5rem;
-        border-left: 4px solid #2E86AB;
-    }
-    .metric-card {
-        background-color: #FFFFFF;
-        padding: 1rem;
-        border-radius: 0.5rem;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    
+    .main-subtitle {
         text-align: center;
+        color: var(--text-secondary);
+        font-size: 1.25rem;
+        margin-bottom: 3rem;
+        font-weight: 400;
+    }
+    
+    /* 聊天消息样式 */
+    .chat-message {
+        padding: 1.25rem;
+        border-radius: 1rem;
+        margin: 1rem 0;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        animation: slideIn 0.3s ease-out;
+    }
+    
+    .user-message {
+        background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
+        border-left: 4px solid var(--primary-color);
+        margin-left: 2rem;
+        position: relative;
+    }
+    
+    .assistant-message {
+        background: linear-gradient(135deg, #F5F5F5 0%, #EEEEEE 100%);
+        border-left: 4px solid var(--accent-color);
+        margin-right: 2rem;
+        position: relative;
+    }
+    
+    .message-avatar {
+        position: absolute;
+        left: -2rem;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        font-weight: bold;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    
+    .user-avatar {
+        background: linear-gradient(135deg, var(--primary-color), #1E40AF);
+        color: white;
+    }
+    
+    .assistant-avatar {
+        background: linear-gradient(135deg, var(--accent-color), #7C3AED);
+        color: white;
+    }
+    
+    /* 面板样式 */
+    .panel {
+        background: var(--card-background);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        border: 1px solid var(--border-color);
+        margin-bottom: 1.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .panel:hover {
+        box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        transform: translateY(-2px);
+    }
+    
+    .panel-header {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    /* 状态卡片 */
+    .status-card {
+        background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
+        border: 1px solid #0EA5E9;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin: 1rem 0;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .status-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: linear-gradient(180deg, var(--primary-color), var(--accent-color));
+    }
+    
+    /* 指标卡片 */
+    .metric-card {
+        background: var(--card-background);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        border: 1px solid var(--border-color);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .metric-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+    }
+    
+    .metric-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    }
+    
+    .metric-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: 0.5rem;
+    }
+    
+    .metric-label {
+        color: var(--text-secondary);
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 0.875rem;
+    }
+    
+    /* 时间轴样式 */
+    .timeline-item {
+        display: flex;
+        align-items: center;
+        margin: 1rem 0;
+        padding: 1rem;
+        border-radius: 0.75rem;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+    
+    .timeline-item.completed {
+        background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%);
+        border-left: 4px solid var(--success-color);
+    }
+    
+    .timeline-item.pending {
+        background: linear-gradient(135deg, #FFF7ED 0%, #FED7AA 100%);
+        border-left: 4px solid #F59E0B;
+    }
+    
+    .timeline-item.waiting {
+        background: linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%);
+        border-left: 4px solid #9CA3AF;
+    }
+    
+    .timeline-icon {
+        font-size: 1.5rem;
+        margin-right: 1rem;
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+    
+    .timeline-content {
+        flex: 1;
+    }
+    
+    .timeline-title {
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+    }
+    
+    .timeline-description {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+    }
+    
+    /* 按钮样式 */
+    .stButton > button {
+        border-radius: 0.75rem;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        background: linear-gradient(135deg, var(--primary-color) 0%, #1E40AF 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+    
+    .stButton > button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
+    }
+    
+    /* 文件上传区域 */
+    .uploadedFile {
+        border-radius: 1rem;
+        border: 2px dashed var(--border-color);
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+    
+    .uploadedFile:hover {
+        border-color: var(--primary-color);
+        background: #F8FAFC;
+    }
+    
+    /* 进度条样式 */
+    .stProgress > div > div > div > div {
+        background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+        border-radius: 1rem;
+    }
+    
+    /* 侧边栏样式 */
+    .css-1d391kg {
+        background: linear-gradient(180deg, #F8FAFC 0%, #F1F5F9 100%);
+    }
+    
+    /* 动画效果 */
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes pulse {
+        0%, 100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.7;
+        }
+    }
+    
+    .pulse {
+        animation: pulse 2s infinite;
+    }
+    
+    /* 响应式设计 */
+    @media (max-width: 768px) {
+        .main-header {
+            font-size: 2rem;
+        }
+        
+        .chat-message {
+            margin-left: 0;
+            margin-right: 0;
+        }
+        
+        .user-message, .assistant-message {
+            margin-left: 0;
+            margin-right: 0;
+        }
     }
 </style>
 """, unsafe_allow_html=True)
@@ -66,19 +352,19 @@ st.markdown("""
 class LLMService:
     def __init__(self):
         self.providers = {
-            'mock': {'name': '本地模拟', 'needsKey': False},
+            'mock': {'name': 'Local Mock', 'needsKey': False},
             'openai': {'name': 'OpenAI GPT', 'needsKey': True, 'url': 'https://api.openai.com/v1/chat/completions'},
             'deepseek': {'name': 'DeepSeek', 'needsKey': True, 'url': 'https://api.aimlapi.com/v1/chat/completions'},
-            'qianwen': {'name': '通义千问', 'needsKey': True, 'url': 'https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation'},
+            'qianwen': {'name': 'Qianwen', 'needsKey': True, 'url': 'https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation'},
         }
     
     async def generate_response(self, message: str, provider: str, api_key: str = None, history: List = None) -> Dict:
-        """生成AI回复"""
+        """Generate AI response"""
         if provider == 'mock':
             return self._mock_response(message)
         
         if not api_key and self.providers[provider]['needsKey']:
-            return {"error": "需要API密钥"}
+            return {"error": "API key required"}
         
         try:
             if provider == 'openai':
@@ -88,31 +374,31 @@ class LLMService:
             elif provider == 'qianwen':
                 return await self._call_qianwen(message, api_key, history or [])
         except Exception as e:
-            return {"error": f"API调用失败: {str(e)}"}
+            return {"error": f"API call failed: {str(e)}"}
     
     def _mock_response(self, message: str) -> Dict:
-        """模拟回复"""
+        """Mock response"""
         message_lower = message.lower()
         
-        if any(word in message_lower for word in ["图片", "图像", "照片", "ocr"]):
+        if any(word in message_lower for word in ["image", "picture", "photo", "ocr", "text recognition"]):
             return {
-                "content": "我看到您提到了图像处理需求。我可以帮您使用OCR技术识别图像中的文字，并将其转换为Markdown格式。请上传您的图像文件。",
-                "suggestions": ["上传图像文件", "查看OCR服务详情", "获取报价"]
+                "content": "I see you mentioned image processing needs. I can help you use OCR technology to recognize text in images and convert it to Markdown format. Please upload your image file.",
+                "suggestions": ["Upload Image File", "View OCR Service Details", "Get Quote"]
             }
-        elif any(word in message_lower for word in ["语音", "音频", "tts"]):
+        elif any(word in message_lower for word in ["voice", "audio", "tts", "speech", "sound"]):
             return {
-                "content": "我了解您需要文本转语音服务。我可以将您的文本转换为高质量的语音文件。请输入您要转换的文本内容。",
-                "suggestions": ["输入文本内容", "选择语音类型", "试听语音样本"]
+                "content": "I understand you need text-to-speech service. I can convert your text into high-quality audio files. Please enter the text content you want to convert.",
+                "suggestions": ["Enter Text Content", "Choose Voice Type", "Preview Voice Sample"]
             }
         else:
             return {
-                "content": "您好！我是AI工作流平台的智能助手。我可以帮您处理：\n\n🖼️ **图像文字识别**：将图片中的文字转换为Markdown格式\n🔊 **文本转语音**：将文本转换为高质量语音文件\n\n请告诉我您需要什么帮助。",
-                "suggestions": ["上传图像文件", "输入要转换的文本", "查看服务价格"]
+                "content": "Hello! I'm the AI assistant for the workflow platform. I can help you with:\n\n🖼️ **Image Text Recognition**: Convert text in images to Markdown format\n🔊 **Text-to-Speech**: Convert text to high-quality audio files\n\nPlease tell me what you need help with.",
+                "suggestions": ["Upload Image File", "Enter Text to Convert", "View Service Pricing"]
             }
     
     async def _call_openai(self, message: str, api_key: str, history: List) -> Dict:
-        """调用OpenAI API"""
-        messages = [{"role": "system", "content": "你是一个AI工作流平台的助手，专门处理OCR和TTS任务。"}]
+        """Call OpenAI API"""
+        messages = [{"role": "system", "content": "You are an AI assistant for a workflow platform, specializing in OCR and TTS tasks."}]
         messages.extend(history)
         messages.append({"role": "user", "content": message})
         
@@ -134,11 +420,11 @@ class LLMService:
             result = response.json()
             return {"content": result['choices'][0]['message']['content']}
         else:
-            return {"error": f"OpenAI API错误: {response.status_code}"}
+            return {"error": f"OpenAI API Error: {response.status_code}"}
     
     async def _call_deepseek(self, message: str, api_key: str, history: List) -> Dict:
-        """调用DeepSeek API"""
-        messages = [{"role": "system", "content": "你是一个AI工作流平台的助手，专门处理OCR和TTS任务。"}]
+        """Call DeepSeek API"""
+        messages = [{"role": "system", "content": "You are an AI assistant for a workflow platform, specializing in OCR and TTS tasks."}]
         messages.extend(history)
         messages.append({"role": "user", "content": message})
         
@@ -160,7 +446,7 @@ class LLMService:
             result = response.json()
             return {"content": result['choices'][0]['message']['content']}
         else:
-            return {"error": f"DeepSeek API错误: {response.status_code}"}
+            return {"error": f"DeepSeek API Error: {response.status_code}"}
 
 # TTS服务类
 class TTSService:
@@ -265,17 +551,18 @@ def main():
     """主应用函数"""
     services = get_services()
     
-    # 页面标题
-    st.markdown("<h1 class='main-header'>🤖 AI多智能体工作流平台</h1>", unsafe_allow_html=True)
+    # Hero Section
+    st.markdown("<h1 class='main-header'>🤖 AI Multi-Agent Workflow Platform</h1>", unsafe_allow_html=True)
+    st.markdown("<p class='main-subtitle'>Transform your content with intelligent OCR and TTS services</p>", unsafe_allow_html=True)
     
-    # 侧边栏配置
+    # Sidebar Configuration
     with st.sidebar:
-        st.header("⚙️ 配置设置")
+        st.header("⚙️ Configuration")
         
-        # LLM配置
-        st.subheader("🧠 AI模型设置")
+        # LLM Configuration
+        st.subheader("🧠 AI Model Settings")
         llm_provider = st.selectbox(
-            "选择AI服务提供商",
+            "Choose AI Service Provider",
             options=list(services['llm'].providers.keys()),
             format_func=lambda x: services['llm'].providers[x]['name']
         )
@@ -283,30 +570,30 @@ def main():
         llm_api_key = ""
         if services['llm'].providers[llm_provider]['needsKey']:
             llm_api_key = st.text_input(
-                "API密钥", 
+                "API Key", 
                 type="password",
-                help=f"请输入{services['llm'].providers[llm_provider]['name']}的API密钥"
+                help=f"Enter your {services['llm'].providers[llm_provider]['name']} API key"
             )
         
-        # TTS配置
-        st.subheader("🎵 语音合成设置")
-        use_elevenlabs = st.checkbox("使用ElevenLabs TTS", help="需要ElevenLabs API密钥")
+        # TTS Configuration
+        st.subheader("🎵 Text-to-Speech Settings")
+        use_elevenlabs = st.checkbox("Use ElevenLabs TTS", help="Requires ElevenLabs API key")
         
         elevenlabs_api_key = ""
         if use_elevenlabs:
             elevenlabs_api_key = st.text_input(
-                "ElevenLabs API密钥",
+                "ElevenLabs API Key",
                 type="password"
             )
         
         voice_id = st.selectbox(
-            "选择语音",
+            "Select Voice",
             options=list(services['tts'].voices.keys()),
             format_func=lambda x: services['tts'].voices[x]
         )
         
-        # 清除聊天历史
-        if st.button("🗑️ 清除聊天历史"):
+        # Clear Chat History
+        if st.button("🗑️ Clear Chat History"):
             st.session_state.messages = []
             st.rerun()
     
@@ -325,42 +612,44 @@ def main():
     col1, col2, col3 = st.columns([1, 1, 1])
     
     with col1:
-        st.header("💬 智能对话")
+        st.markdown('<div class="panel"><div class="panel-header">💬 Smart Conversation</div>', unsafe_allow_html=True)
         
-        # 显示聊天历史
+        # Display Chat History
         chat_container = st.container()
         with chat_container:
             for message in st.session_state.messages:
                 if message["role"] == "user":
                     st.markdown(f"""
                     <div class="chat-message user-message">
-                        <strong>👤 您:</strong><br>
+                        <div class="message-avatar user-avatar">👤</div>
+                        <strong>You:</strong><br>
                         {message["content"]}
                     </div>
                     """, unsafe_allow_html=True)
                 else:
                     st.markdown(f"""
                     <div class="chat-message assistant-message">
-                        <strong>🤖 助手:</strong><br>
+                        <div class="message-avatar assistant-avatar">🤖</div>
+                        <strong>Assistant:</strong><br>
                         {message["content"]}
                     </div>
                     """, unsafe_allow_html=True)
         
-        # 文件上传
+        # File Upload
         uploaded_file = st.file_uploader(
-            "📁 上传图像文件 (OCR)",
+            "📁 Upload Image File (OCR)",
             type=['png', 'jpg', 'jpeg', 'pdf'],
-            help="支持PNG、JPG、JPEG、PDF格式"
+            help="Supports PNG, JPG, JPEG, PDF formats"
         )
         
         if uploaded_file is not None:
-            # 显示上传的图像
+            # Display uploaded image
             if uploaded_file.type.startswith('image'):
-                st.image(uploaded_file, caption="上传的图像", use_column_width=True)
+                st.image(uploaded_file, caption="Uploaded Image", use_column_width=True)
             
-            if st.button("🔍 开始OCR识别"):
-                with st.spinner("正在识别图像中的文字..."):
-                    # 处理OCR
+            if st.button("🔍 Start OCR Recognition"):
+                with st.spinner("Recognizing text in image..."):
+                    # Process OCR
                     image_data = uploaded_file.read()
                     ocr_result = services['ocr'].extract_text_mock(image_data)
                     
@@ -371,37 +660,37 @@ def main():
                             "result": ocr_result
                         })
                         
-                        # 添加到聊天历史
+                        # Add to chat history
                         st.session_state.messages.append({
                             "role": "user",
-                            "content": f"上传了图像文件: {uploaded_file.name}"
+                            "content": f"Uploaded image file: {uploaded_file.name}"
                         })
                         st.session_state.messages.append({
                             "role": "assistant", 
-                            "content": f"✅ OCR识别完成！\n\n**识别结果:**\n{ocr_result['extracted_text']}\n\n**质量评分:** {ocr_result['qc_report']['score']}/100"
+                            "content": f"✅ OCR Recognition Completed!\n\n**Extracted Text:**\n{ocr_result['extracted_text']}\n\n**Quality Score:** {ocr_result['qc_report']['score']}/100"
                         })
                         st.rerun()
         
-        # 聊天输入
-        user_input = st.text_input("💭 输入您的问题或需求:", key="chat_input")
+        # Chat Input
+        user_input = st.text_input("💭 Enter your question or request:", key="chat_input")
         
-        if st.button("发送", key="send_message") and user_input:
+        if st.button("Send", key="send_message") and user_input:
             # 添加用户消息
             st.session_state.messages.append({"role": "user", "content": user_input})
             
-            # 生成AI回复
-            with st.spinner("AI正在思考..."):
+            # Generate AI response
+            with st.spinner("AI is thinking..."):
                 history = [{"role": msg["role"], "content": msg["content"]} 
-                          for msg in st.session_state.messages[-5:]]  # 只保留最近5条消息作为上下文
+                          for msg in st.session_state.messages[-5:]]  # Keep only last 5 messages as context
                 
                 import asyncio
                 try:
-                    # 由于Streamlit不支持异步，使用同步方式
+                    # Since Streamlit doesn't support async, use synchronous approach
                     if llm_provider == 'mock':
                         response = services['llm']._mock_response(user_input)
                     else:
-                        # 这里需要同步调用API
-                        response = {"content": "抱歉，在Streamlit环境中暂时无法调用外部API。请使用本地模拟模式。"}
+                        # API calls need to be synchronous here
+                        response = {"content": "Sorry, external API calls are temporarily unavailable in Streamlit environment. Please use Local Mock mode."}
                 except Exception as e:
                     response = {"error": str(e)}
                 
@@ -412,66 +701,68 @@ def main():
                 
                 st.session_state.messages.append({"role": "assistant", "content": ai_response})
                 st.rerun()
+        
+        st.markdown('</div>', unsafe_allow_html=True)
     
     with col2:
-        st.header("💰 报价与支付")
+        st.markdown('<div class="panel"><div class="panel-header">💰 Quote & Payment</div>', unsafe_allow_html=True)
         
-        # 生成报价
-        if st.button("📊 生成项目报价"):
+        # Generate Quote
+        if st.button("📊 Generate Project Quote"):
             quote = {
                 "quote_id": str(uuid.uuid4()),
                 "tasks": [
                     {
-                        "name": "图像OCR识别",
-                        "description": "将图像中的文字识别并转换为Markdown格式",
+                        "name": "Image OCR Recognition",
+                        "description": "Recognize text in images and convert to Markdown format",
                         "price": 50.0,
-                        "estimated_time": "5-10分钟"
+                        "estimated_time": "5-10 minutes"
                     },
                     {
-                        "name": "文本转语音",
-                        "description": "将文本转换为高质量语音文件",
+                        "name": "Text-to-Speech",
+                        "description": "Convert text to high-quality audio files",
                         "price": 30.0,
-                        "estimated_time": "3-8分钟"
+                        "estimated_time": "3-8 minutes"
                     }
                 ],
                 "total_price": 80.0,
-                "currency": "CNY",
+                "currency": "USD",
                 "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             }
             
             st.session_state.project_data["quotes"].append(quote)
-            st.success("✅ 报价生成成功！")
+            st.success("✅ Quote generated successfully!")
         
-        # 显示报价
+        # Display Quote
         if st.session_state.project_data["quotes"]:
             latest_quote = st.session_state.project_data["quotes"][-1]
             
             st.markdown(f"""
             <div class="status-card">
-                <h4>📋 最新报价</h4>
-                <p><strong>报价ID:</strong> {latest_quote['quote_id'][:8]}...</p>
-                <p><strong>总价:</strong> ¥{latest_quote['total_price']}</p>
-                <p><strong>创建时间:</strong> {latest_quote['created_at']}</p>
+                <h4>📋 Latest Quote</h4>
+                <p><strong>Quote ID:</strong> {latest_quote['quote_id'][:8]}...</p>
+                <p><strong>Total Price:</strong> ${latest_quote['total_price']}</p>
+                <p><strong>Created:</strong> {latest_quote['created_at']}</p>
             </div>
             """, unsafe_allow_html=True)
             
-            st.subheader("📝 任务明细")
+            st.subheader("📝 Task Details")
             for task in latest_quote["tasks"]:
-                with st.expander(f"{task['name']} - ¥{task['price']}"):
-                    st.write(f"**描述:** {task['description']}")
-                    st.write(f"**预估时间:** {task['estimated_time']}")
+                with st.expander(f"{task['name']} - ${task['price']}"):
+                    st.write(f"**Description:** {task['description']}")
+                    st.write(f"**Estimated Time:** {task['estimated_time']}")
             
-            # 模拟支付
-            if st.button("💳 确认支付"):
+            # Mock Payment
+            if st.button("💳 Confirm Payment"):
                 st.session_state.project_data["payment_status"] = "completed"
-                st.success("✅ 支付成功！项目已启动。")
+                st.success("✅ Payment successful! Project started.")
         
-        # TTS功能
-        st.subheader("🎵 文本转语音")
-        tts_text = st.text_area("输入要转换的文本:", height=100)
+        # TTS Function
+        st.subheader("🎵 Text-to-Speech")
+        tts_text = st.text_area("Enter text to convert:", height=100)
         
-        if st.button("🔊 生成语音") and tts_text:
-            with st.spinner("正在生成语音..."):
+        if st.button("🔊 Generate Speech") and tts_text:
+            with st.spinner("Generating speech..."):
                 if use_elevenlabs and elevenlabs_api_key:
                     tts_result = services['tts'].generate_tts_with_elevenlabs(
                         tts_text, voice_id, elevenlabs_api_key
@@ -482,97 +773,104 @@ def main():
                 if "error" in tts_result:
                     st.error(f"❌ {tts_result['error']}")
                 else:
-                    st.success("✅ 语音生成成功！")
+                    st.success("✅ Speech generated successfully!")
                     
-                    # 显示TTS结果
+                    # Display TTS results
                     if "audio_data" in tts_result:
                         st.audio(tts_result["audio_data"], format="audio/mp3")
                     
-                    # 显示QC报告
+                    # Display QC Report
                     if "qc_report" in tts_result:
                         qc = tts_result["qc_report"]
                         st.markdown(f"""
-                        **QC质量报告:**
-                        - 总分: {qc['score']}/100
-                        - 音频质量: {qc['audio_quality']}/100
-                        - 文本准确性: {qc['text_accuracy']}/100
-                        - 语音一致性: {qc['voice_consistency']}/100
+                        **QC Quality Report:**
+                        - Overall Score: {qc['score']}/100
+                        - Audio Quality: {qc['audio_quality']}/100
+                        - Text Accuracy: {qc['text_accuracy']}/100
+                        - Voice Consistency: {qc['voice_consistency']}/100
                         """)
                     
-                    # 保存到项目数据
+                    # Save to project data
                     st.session_state.project_data["files"].append({
                         "type": "tts",
                         "text": tts_text,
                         "result": tts_result
                     })
+        
+        st.markdown('</div>', unsafe_allow_html=True)
     
     with col3:
-        st.header("📈 项目进度")
+        st.markdown('<div class="panel"><div class="panel-header">📈 Project Progress</div>', unsafe_allow_html=True)
         
-        # 进度时间轴
+        # Progress Timeline
         timeline_stages = [
-            {"name": "需求澄清", "status": "completed", "progress": 100},
-            {"name": "报价生成", "status": "completed" if st.session_state.project_data["quotes"] else "pending", "progress": 100 if st.session_state.project_data["quotes"] else 0},
-            {"name": "支付确认", "status": "completed" if st.session_state.project_data.get("payment_status") == "completed" else "pending", "progress": 100 if st.session_state.project_data.get("payment_status") == "completed" else 0},
-            {"name": "任务处理", "status": "completed" if st.session_state.project_data["files"] else "pending", "progress": 100 if st.session_state.project_data["files"] else 0},
-            {"name": "质量检查", "status": "completed" if st.session_state.project_data["files"] else "pending", "progress": 100 if st.session_state.project_data["files"] else 0},
-            {"name": "交付完成", "status": "completed" if len(st.session_state.project_data["files"]) >= 2 else "pending", "progress": 100 if len(st.session_state.project_data["files"]) >= 2 else 0}
+            {"name": "Requirements", "status": "completed", "progress": 100},
+            {"name": "Quote Generation", "status": "completed" if st.session_state.project_data["quotes"] else "pending", "progress": 100 if st.session_state.project_data["quotes"] else 0},
+            {"name": "Payment", "status": "completed" if st.session_state.project_data.get("payment_status") == "completed" else "pending", "progress": 100 if st.session_state.project_data.get("payment_status") == "completed" else 0},
+            {"name": "Processing", "status": "completed" if st.session_state.project_data["files"] else "pending", "progress": 100 if st.session_state.project_data["files"] else 0},
+            {"name": "Quality Check", "status": "completed" if st.session_state.project_data["files"] else "pending", "progress": 100 if st.session_state.project_data["files"] else 0},
+            {"name": "Delivery", "status": "completed" if len(st.session_state.project_data["files"]) >= 2 else "pending", "progress": 100 if len(st.session_state.project_data["files"]) >= 2 else 0}
         ]
         
         for i, stage in enumerate(timeline_stages):
             if stage["status"] == "completed":
                 icon = "✅"
-                color = "#4CAF50"
+                css_class = "completed"
             elif stage["status"] == "pending":
                 icon = "⏳"
-                color = "#FF9800"
+                css_class = "pending"
             else:
                 icon = "⭕"
-                color = "#9E9E9E"
+                css_class = "waiting"
             
             st.markdown(f"""
-            <div style="display: flex; align-items: center; margin: 0.5rem 0;">
-                <span style="font-size: 1.2rem; margin-right: 0.5rem;">{icon}</span>
-                <span style="color: {color}; font-weight: bold;">{stage['name']}</span>
+            <div class="timeline-item {css_class}">
+                <div class="timeline-icon">{icon}</div>
+                <div class="timeline-content">
+                    <div class="timeline-title">{stage['name']}</div>
+                    <div class="timeline-description">Progress: {stage['progress']}%</div>
+                </div>
             </div>
             """, unsafe_allow_html=True)
             
             if stage["progress"] > 0:
                 st.progress(stage["progress"] / 100)
         
-        # 项目统计
-        st.subheader("📊 项目统计")
+        # Project Statistics
+        st.subheader("📊 Project Statistics")
         
         col_a, col_b = st.columns(2)
         with col_a:
             st.markdown(f"""
             <div class="metric-card">
-                <h3>{len(st.session_state.project_data['files'])}</h3>
-                <p>已处理文件</p>
+                <div class="metric-number">{len(st.session_state.project_data['files'])}</div>
+                <div class="metric-label">Files Processed</div>
             </div>
             """, unsafe_allow_html=True)
         
         with col_b:
             st.markdown(f"""
             <div class="metric-card">
-                <h3>{len(st.session_state.project_data['quotes'])}</h3>
-                <p>生成报价</p>
+                <div class="metric-number">{len(st.session_state.project_data['quotes'])}</div>
+                <div class="metric-label">Quotes Generated</div>
             </div>
             """, unsafe_allow_html=True)
         
-        # 文件列表
+        # File Results
         if st.session_state.project_data["files"]:
-            st.subheader("📁 处理结果")
+            st.subheader("📁 Processing Results")
             for i, file_data in enumerate(st.session_state.project_data["files"]):
-                with st.expander(f"{file_data['type'].upper()} - {file_data.get('filename', f'任务{i+1}')}"):
+                with st.expander(f"{file_data['type'].upper()} - {file_data.get('filename', f'Task {i+1}')}"):
                     if file_data["type"] == "ocr":
-                        st.markdown("**识别文本:**")
+                        st.markdown("**Extracted Text:**")
                         st.text_area("", value=file_data["result"]["extracted_text"], height=100, disabled=True, key=f"ocr_{i}")
-                        st.markdown(f"**置信度:** {file_data['result']['confidence']:.2%}")
+                        st.markdown(f"**Confidence:** {file_data['result']['confidence']:.2%}")
                     elif file_data["type"] == "tts":
-                        st.markdown(f"**原文本:** {file_data['text']}")
+                        st.markdown(f"**Original Text:** {file_data['text']}")
                         if "qc_report" in file_data["result"]:
-                            st.markdown(f"**质量评分:** {file_data['result']['qc_report']['score']}/100")
+                            st.markdown(f"**Quality Score:** {file_data['result']['qc_report']['score']}/100")
+        
+        st.markdown('</div>', unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
